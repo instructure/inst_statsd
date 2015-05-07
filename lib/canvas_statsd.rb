@@ -4,6 +4,7 @@ module CanvasStatsd
   require "canvas_statsd/statsd"
   require "canvas_statsd/request_stat"
   require "canvas_statsd/counter"
+  require "canvas_statsd/sql_tracker"
 
   def self.settings
     @settings || env_settings

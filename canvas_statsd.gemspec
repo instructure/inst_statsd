@@ -8,6 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Nick Cloward"]
   spec.email         = ["ncloward@instructure.com"]
   spec.summary       = %q{Statsd for Canvas}
+  spec.homepage      = "https://github.com/instructure/canvas_statsd"
+  spec.license       = "MIT"
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

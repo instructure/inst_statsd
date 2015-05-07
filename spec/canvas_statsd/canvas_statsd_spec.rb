@@ -20,7 +20,16 @@ require 'spec_helper'
 
 describe CanvasStatsd do
   before(:each) do
-    CanvasStatsd.settings = {}
+    CanvasStatsd.settings = nil
+  end
+
+  after(:each) do
+    [
+      'CANVAS_STATSD_HOST',
+      'CANVAS_STATSD_NAMESPACE',
+      'CANVAS_STATSD_PORT',
+      'CANVAS_STATSD_APPEND_HOST_NAME',
+    ].each {|k| ENV.delete k}
   end
 
   describe ".settings" do
@@ -34,5 +43,83 @@ describe CanvasStatsd do
 
       expect(CanvasStatsd.settings).to eq settings
     end
+
+    it 'pulls from ENV if not already set' do
+      ENV['CANVAS_STATSD_HOST'] = 'statsd.example.org'
+      ENV['CANVAS_STATSD_NAMESPACE'] = 'canvas'
+
+      expected = {
+        host: 'statsd.example.org',
+        namespace: 'canvas',
+      }
+      expect(CanvasStatsd.settings).to eq(expected)
+
+    end
+
+    it 'configured settings take precedence over ENV settings' do
+      ENV['CANVAS_STATSD_HOST'] = 'statsd.example.org'
+      ENV['CANVAS_STATSD_NAMESPACE'] = 'canvas'
+
+      settings = {foo: 'bar', baz: 'apple'}
+      CanvasStatsd.settings = settings
+      expect(CanvasStatsd.settings).to eq settings
+    end
   end
+
+  describe ".env_settings" do
+    it 'returns empty hash when no CANVAS_STATSD_HOST found' do
+      env = {
+        'CANVAS_STATSD_NAMESPACE' => 'canvas'
+      }
+      expect(CanvasStatsd.env_settings(env)).to eq({})
+    end
+
+    it 'builds settings hash from environment vars' do
+      env = {
+        'CANVAS_STATSD_HOST' => 'statsd.example.org',
+        'CANVAS_STATSD_NAMESPACE' => 'canvas',
+      }
+      expected = {
+        host: 'statsd.example.org',
+        namespace: 'canvas',
+      }
+      expect(CanvasStatsd.env_settings(env)).to eq(expected)
+    end
+
+    it 'uses ENV if env argument hash not passed' do
+      ENV['CANVAS_STATSD_HOST'] = 'statsd.example.org'
+      ENV['CANVAS_STATSD_NAMESPACE'] = 'canvas'
+
+      expected = {
+        host: 'statsd.example.org',
+        namespace: 'canvas',
+      }
+      expect(CanvasStatsd.env_settings).to eq(expected)
+    end
+
+    it 'converts env append_hostname "false" to boolean' do
+      env = {
+        'CANVAS_STATSD_HOST' => 'statsd.example.org',
+        'CANVAS_STATSD_APPEND_HOSTNAME' => 'false',
+      }
+      expected = {
+        host: 'statsd.example.org',
+        append_hostname: false,
+      }
+      expect(CanvasStatsd.env_settings(env)).to eq(expected)
+    end
+
+    it 'converts env append_hostname "true" to boolean' do
+      env = {
+        'CANVAS_STATSD_HOST' => 'statsd.example.org',
+        'CANVAS_STATSD_APPEND_HOSTNAME' => 'true',
+      }
+      expected = {
+        host: 'statsd.example.org',
+        append_hostname: true,
+      }
+      expect(CanvasStatsd.env_settings(env)).to eq(expected)
+    end
+  end
+
 end

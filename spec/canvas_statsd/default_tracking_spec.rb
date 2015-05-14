@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'aroi' # ensure aroi is loaded (its only conditionally loaded by default)
 
 describe CanvasStatsd::DefaultTracking do
 

@@ -1,5 +1,5 @@
 require 'statsd'
-require "aroi"
+require "aroi" if defined?(ActiveRecord)
 
 module CanvasStatsd
 

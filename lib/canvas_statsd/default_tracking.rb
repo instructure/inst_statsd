@@ -5,7 +5,8 @@ module CanvasStatsd
     @sql_tracker = CanvasStatsd::SqlTracker.new(blocked_names: ['SCHEMA'])
 
     def self.track_default_metrics(options={})
-      options = {sql: true, active_record: true}.merge(options)
+      options = {sql: true, active_record: true, logger: nil}.merge(options)
+      @logger = RequestLogger.new(options[:logger])
       track_timing
       track_sql if !!options[:sql]
       track_active_record if !!options[:active_record]
@@ -57,6 +58,7 @@ module CanvasStatsd
       request_stat.sql_write_count = @sql_tracker.num_writes if @tracking_sql
       request_stat.sql_cache_count = @sql_tracker.num_caches if @tracking_sql
       request_stat.report
+      @logger.log(request_stat)
     end
 
   end

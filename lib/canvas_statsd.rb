@@ -8,6 +8,8 @@ module CanvasStatsd
   require "canvas_statsd/counter"
   require "canvas_statsd/sql_tracker"
   require "canvas_statsd/default_tracking"
+  require "canvas_statsd/request_logger"
+  require "canvas_statsd/null_logger"
 
   def self.settings
     @settings || env_settings

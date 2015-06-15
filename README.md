@@ -132,6 +132,13 @@ both).  For example the following would track all of the above except
 CanvasStatsd.track_default_metrics active_record: false
 ```
 
+If you'd like CanvasStatsd to log the default metrics (as well as sending them to statsd), pass a logger object along like so:
+
+```ruby
+# log default metrics to environment logs in Rails
+CanvasStatsd.track_default_metrics logger: Rails.logger
+```
+
 
 ## Contributing
 

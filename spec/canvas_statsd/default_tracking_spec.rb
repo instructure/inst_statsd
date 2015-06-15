@@ -20,6 +20,13 @@ describe CanvasStatsd::DefaultTracking do
       expect(CanvasStatsd::DefaultTracking).not_to receive(:track_active_record)
       CanvasStatsd::DefaultTracking.track_default_metrics active_record: false
     end
+
+    it 'should delegate log messages to the optional logger' do
+      log_double = double()
+      expect(log_double).to receive(:info)
+      CanvasStatsd::DefaultTracking.track_default_metrics logger: log_double
+      CanvasStatsd::DefaultTracking.finalize_processing('name', 1000, 10001, 1234, {})
+    end
   end
 
   describe '#track_active_record' do

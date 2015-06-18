@@ -3,6 +3,8 @@ require "aroi" if defined?(ActiveRecord)
 
 module CanvasStatsd
 
+  class ConfigurationError < StandardError; end
+
   require "canvas_statsd/statsd"
   require "canvas_statsd/request_stat"
   require "canvas_statsd/counter"
@@ -27,9 +29,18 @@ module CanvasStatsd
       append_hostname: env.fetch('CANVAS_STATSD_APPEND_HOSTNAME', nil),
     }
     config.delete_if {|k,v| v.nil?}
-    config[:append_hostname] = false if config[:append_hostname] == 'false';
-    config[:append_hostname] = true if config[:append_hostname] == 'true';
+    convert_bool(config, :append_hostname)
     config[:host] ? config : {}
+  end
+
+  def self.convert_bool(hash, key)
+    value = hash[key]
+    return if value.nil?
+    unless ['true', 'false', true, false].include?(value)
+      message = "#{key} must be a boolean, or the string representation of a boolean, got: #{value}"
+      raise CanvasStatsd::ConfigurationError, message
+    end
+    hash[key] = (value == 'true' || value == true) ? true : false
   end
 
   def self.track_default_metrics options={}

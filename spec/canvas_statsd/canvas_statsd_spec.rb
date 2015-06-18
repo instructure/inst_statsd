@@ -66,6 +66,39 @@ describe CanvasStatsd do
     end
   end
 
+  describe ".convert_bool" do
+    it 'sets string true values to boolean true' do
+      config = {potential_string_bool: 'true'}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config[:potential_string_bool]).to be(true)
+    end
+    it 'sets boolean true values to boolean true' do
+      config = {potential_string_bool: true}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config[:potential_string_bool]).to be(true)
+    end
+    it 'sets false strings to boolean false' do
+      config = {potential_string_bool: 'false'}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config[:potential_string_bool]).to be(false)
+    end
+    it 'sets false booleans to boolean false' do
+      config = {potential_string_bool: false}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config[:potential_string_bool]).to be(false)
+    end
+    it 'makes no change for nil values' do
+      config = {foo: 'bar'}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config).to eq({foo: 'bar'})
+    end
+    it 'raises error for non true or false strings or booleans' do
+      config = {potential_string_bool: 'trrruuue'}
+      expect{CanvasStatsd.convert_bool(config, :potential_string_bool)}.to raise_error(CanvasStatsd::ConfigurationError)
+    end
+
+  end
+
   describe ".env_settings" do
     it 'returns empty hash when no CANVAS_STATSD_HOST found' do
       env = {
@@ -120,6 +153,31 @@ describe CanvasStatsd do
       }
       expect(CanvasStatsd.env_settings(env)).to eq(expected)
     end
+
+    it 'keeps boolean false values for append_hostname' do
+      env = {
+        'CANVAS_STATSD_HOST' => 'statsd.example.org',
+        'CANVAS_STATSD_APPEND_HOSTNAME' => false,
+      }
+      expected = {
+        host: 'statsd.example.org',
+        append_hostname: false,
+      }
+      expect(CanvasStatsd.env_settings(env)).to eq(expected)
+    end
+
+    it 'keeps boolean true values for append_hostname' do
+      env = {
+        'CANVAS_STATSD_HOST' => 'statsd.example.org',
+        'CANVAS_STATSD_APPEND_HOSTNAME' => true,
+      }
+      expected = {
+        host: 'statsd.example.org',
+        append_hostname: true,
+      }
+      expect(CanvasStatsd.env_settings(env)).to eq(expected)
+    end
+
   end
 
 end

@@ -25,7 +25,7 @@ module CanvasStatsd
       message = "[#{header}]"
       VALUES_MAP.each do |k,v|
         value = request_stat.respond_to?(v) ? request_stat.send(v) : nil
-        message += " (#{k}: #{value})" if value
+        message += " (#{k}: #{"%.2f" % value})" if value
       end
       message
     end

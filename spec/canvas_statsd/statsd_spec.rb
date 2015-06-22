@@ -68,6 +68,26 @@ describe CanvasStatsd::Statsd do
     expect(instance.namespace).to eq "test"
   end
 
+  describe ".escape" do
+    it "replaces any dots in str with a _ when no replacment given" do
+      result = CanvasStatsd::Statsd.escape("lots.of.dots")
+      expect(result).to eq "lots_of_dots"
+    end
+
+    it "replaces any dots in str with replacement arg" do
+      result = CanvasStatsd::Statsd.escape("lots.of.dots", "/")
+      expect(result).to eq "lots/of/dots"
+    end
+
+    it "returns str when given a str that doesnt respond to gsub" do
+      result = CanvasStatsd::Statsd.escape(nil)
+      expect(result).to eq nil
+      hash = {foo: 'bar'}
+      result = CanvasStatsd::Statsd.escape(hash)
+      expect(result).to eq hash
+    end
+  end
+
   after do
     CanvasStatsd::Statsd.reset_instance
   end

@@ -36,11 +36,11 @@ module CanvasStatsd
   def self.convert_bool(hash, key)
     value = hash[key]
     return if value.nil?
-    unless ['true', 'false', true, false].include?(value)
+    unless ['true', 'True', 'false', 'False', true, false].include?(value)
       message = "#{key} must be a boolean, or the string representation of a boolean, got: #{value}"
       raise CanvasStatsd::ConfigurationError, message
     end
-    hash[key] = (value == 'true' || value == true) ? true : false
+    hash[key] = ['true', 'True', true].include?(value)
   end
 
   def self.track_default_metrics options={}

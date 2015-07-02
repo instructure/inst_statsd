@@ -72,6 +72,11 @@ describe CanvasStatsd do
       CanvasStatsd.convert_bool(config, :potential_string_bool)
       expect(config[:potential_string_bool]).to be(true)
     end
+    it 'sets string True values to boolean true' do
+      config = {potential_string_bool: 'True'}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config[:potential_string_bool]).to be(true)
+    end
     it 'sets boolean true values to boolean true' do
       config = {potential_string_bool: true}
       CanvasStatsd.convert_bool(config, :potential_string_bool)
@@ -79,6 +84,11 @@ describe CanvasStatsd do
     end
     it 'sets false strings to boolean false' do
       config = {potential_string_bool: 'false'}
+      CanvasStatsd.convert_bool(config, :potential_string_bool)
+      expect(config[:potential_string_bool]).to be(false)
+    end
+    it 'sets False strings to boolean false' do
+      config = {potential_string_bool: 'False'}
       CanvasStatsd.convert_bool(config, :potential_string_bool)
       expect(config[:potential_string_bool]).to be(false)
     end

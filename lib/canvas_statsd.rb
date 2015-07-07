@@ -3,6 +3,8 @@ require "aroi" if defined?(ActiveRecord)
 
 module CanvasStatsd
 
+  @settings = {}
+
   class ConfigurationError < StandardError; end
 
   require "canvas_statsd/statsd"
@@ -14,7 +16,7 @@ module CanvasStatsd
   require "canvas_statsd/null_logger"
 
   def self.settings
-    @settings || env_settings
+    env_settings.merge(@settings)
   end
 
   def self.settings=(value)

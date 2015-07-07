@@ -26,7 +26,7 @@ settings = {
 CanvasStatsd.settings = settings
 ```
 
-Values passed to `CanvasStatsd.settings` will take precedence over ENV vars
+Values passed to `CanvasStatsd.settings` will be merged into and take precedence over any existing ENV vars
 
 
 

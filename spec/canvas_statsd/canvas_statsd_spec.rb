@@ -20,7 +20,7 @@ require 'spec_helper'
 
 describe CanvasStatsd do
   before(:each) do
-    CanvasStatsd.settings = nil
+    CanvasStatsd.settings = {}
   end
 
   after(:each) do
@@ -56,13 +56,15 @@ describe CanvasStatsd do
 
     end
 
-    it 'configured settings take precedence over ENV settings' do
+    it 'configured settings are merged into and take precedence over any existing ENV settings' do
       ENV['CANVAS_STATSD_HOST'] = 'statsd.example.org'
       ENV['CANVAS_STATSD_NAMESPACE'] = 'canvas'
 
-      settings = {foo: 'bar', baz: 'apple'}
+      settings = {foo: 'bar', baz: 'apple', host: 'statsd.example-override.org'}
       CanvasStatsd.settings = settings
-      expect(CanvasStatsd.settings).to eq settings
+
+      expect(CanvasStatsd.settings).to eq(CanvasStatsd.env_settings.merge(settings))
+      expect(CanvasStatsd.settings[:host]).to eq(settings[:host])
     end
   end
 

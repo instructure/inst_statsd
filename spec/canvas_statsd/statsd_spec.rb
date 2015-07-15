@@ -21,6 +21,11 @@ require 'spec_helper'
 describe CanvasStatsd::Statsd do
   METHODS = %w(increment decrement count gauge timing)
 
+  after do
+    CanvasStatsd.settings = {}
+    CanvasStatsd::Statsd.reset_instance
+  end
+
   it "appends the hostname to stat names by default" do
     CanvasStatsd::Statsd.stub(:hostname).and_return("testhost")
     statsd = double
@@ -86,9 +91,5 @@ describe CanvasStatsd::Statsd do
       result = CanvasStatsd::Statsd.escape(hash)
       expect(result).to eq hash
     end
-  end
-
-  after do
-    CanvasStatsd::Statsd.reset_instance
   end
 end

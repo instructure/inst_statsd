@@ -27,10 +27,10 @@ describe CanvasStatsd::Statsd do
   end
 
   it "appends the hostname to stat names by default" do
-    CanvasStatsd::Statsd.stub(:hostname).and_return("testhost")
+    allow(CanvasStatsd::Statsd).to receive(:hostname).and_return("testhost")
     statsd = double
-    CanvasStatsd::Statsd.stub(:instance).and_return(statsd)
-    CanvasStatsd::Statsd.stub(:append_hostname?).and_return(true)
+    allow(CanvasStatsd::Statsd).to receive(:instance).and_return(statsd)
+    allow(CanvasStatsd::Statsd).to receive(:append_hostname?).and_return(true)
     METHODS.each do |method|
       expect(statsd).to receive(method).with("test.name.testhost", "test")
       CanvasStatsd::Statsd.send(method, "test.name", "test")
@@ -42,8 +42,8 @@ describe CanvasStatsd::Statsd do
   it "omits hostname if specified in config" do
     expect(CanvasStatsd::Statsd).to receive(:hostname).never
     statsd = double
-    CanvasStatsd::Statsd.stub(:instance).and_return(statsd)
-    CanvasStatsd::Statsd.stub(:append_hostname?).and_return(false)
+    allow(CanvasStatsd::Statsd).to receive(:instance).and_return(statsd)
+    allow(CanvasStatsd::Statsd).to receive(:append_hostname?).and_return(false)
     METHODS.each do |method|
       expect(statsd).to receive(method).with("test.name", "test")
       CanvasStatsd::Statsd.send(method, "test.name", "test")
@@ -53,7 +53,7 @@ describe CanvasStatsd::Statsd do
   end
 
   it "ignores all calls if statsd isn't enabled" do
-    CanvasStatsd::Statsd.stub(:instance).and_return(nil)
+    allow(CanvasStatsd::Statsd).to receive(:instance).and_return(nil)
     METHODS.each do |method|
       expect(CanvasStatsd::Statsd.send(method, "test.name")).to be_nil
     end

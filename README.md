@@ -116,6 +116,7 @@ timings) per request:
 | sql read      | controller.action.sql.read      | number of sql reads                       |
 | sql cache     | controller.action.sql.cache     | number of sql cache                       |
 | active record | controller.action.active_record | number of ActiveRecord objects created ** |
+| cache read    | controller.action.cache.read    | number of cache reads                     |
 
 
 \* as reported by [`ActiveSupport::Notifications`](http://api.rubyonrails.org/classes/ActiveSupport/Notifications.html)

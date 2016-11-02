@@ -8,7 +8,8 @@ module CanvasStatsd
         sql_read: :sql_read_count,
         sql_write: :sql_write_count,
         sql_cache: :sql_cache_count,
-        active_record: :ar_count
+        active_record: :ar_count,
+        cache_read: :cache_read_count,
       }.freeze
 
 

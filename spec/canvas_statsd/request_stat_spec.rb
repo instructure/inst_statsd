@@ -121,6 +121,16 @@ describe CanvasStatsd::RequestStat do
       rs.report
     end
 
+    it 'sends cache_read_count when present' do
+      statsd = double
+      payload = {
+        params: {
+          'controller' => 'foo',
+          'action'     => 'index'
+        }
+      }
+    end
+
     describe 'sql stats' do
 
       before :each do
@@ -132,6 +142,8 @@ describe CanvasStatsd::RequestStat do
           }
         }
         @rs = create_subject(payload, @statsd)
+        @rs.cache_read_count = 25
+        expect(@statsd).to receive(:timing).with('request.foo.index.cache.read', 25)
       end
 
       it 'doesnt send sql stats when they dont exist' do

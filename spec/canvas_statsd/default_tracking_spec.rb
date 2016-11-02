@@ -21,6 +21,11 @@ describe CanvasStatsd::DefaultTracking do
       CanvasStatsd::DefaultTracking.track_default_metrics active_record: false
     end
 
+    it 'should not track cache when cache: false option' do
+      expect(CanvasStatsd::DefaultTracking).not_to receive(:track_cache)
+      CanvasStatsd::DefaultTracking.track_default_metrics cache: false
+    end
+
     it 'should delegate log messages to the optional logger' do
       log_double = double()
       expect(log_double).to receive(:info)
@@ -39,11 +44,10 @@ describe CanvasStatsd::DefaultTracking do
   describe '#subscribe' do
     it 'should subscribe via ActiveSupport::Notifications' do
       target = double()
-      CanvasStatsd::DefaultTracking.subscribe(/test.notification/) {|*args| target.callback(*args)}
+      CanvasStatsd::DefaultTracking.subscribe(/test\.notification/) {|*args| target.callback(*args)}
       expect(target).to receive(:callback)
       ActiveSupport::Notifications.instrument('test.notification') {}
     end
   end
 
 end
-

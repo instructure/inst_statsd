@@ -2,8 +2,7 @@ require 'statsd'
 require "aroi" if defined?(ActiveRecord)
 
 module CanvasStatsd
-
-  @settings = {}
+  VALID_SETTINGS = [:host, :port, :namespace, :append_hostname]
 
   class ConfigurationError < StandardError; end
 
@@ -16,11 +15,25 @@ module CanvasStatsd
   require "canvas_statsd/null_logger"
 
   def self.settings
-    env_settings.merge(@settings)
+    @settings || env_settings
   end
 
   def self.settings=(value)
-    @settings = value
+    @settings = validate_settings(value)
+  end
+
+  def self.validate_settings(value)
+    return nil if value.nil?
+
+    validated = {}
+    value.each do |k,v|
+      if !VALID_SETTINGS.include?(k.to_sym)
+        raise CanvasStatsd::ConfigurationError, "Invalid key: #{k}"
+      end
+      validated[k.to_sym] = v
+    end
+
+    env_settings.merge(validated)
   end
 
   def self.env_settings(env=ENV)

@@ -63,12 +63,12 @@ describe CanvasStatsd::Statsd do
   it "configures a statsd instance" do
     expect(CanvasStatsd::Statsd.instance).to be_nil
 
-    CanvasStatsd.settings = { :host => "testhost", :namespace => "test", :port => 1234 }
+    CanvasStatsd.settings = { :host => "localhost", :namespace => "test", :port => 1234 }
     CanvasStatsd::Statsd.reset_instance
 
     instance = CanvasStatsd::Statsd.instance
     expect(instance).to be_a ::Statsd
-    expect(instance.host).to eq "testhost"
+    expect(instance.host).to eq "localhost"
     expect(instance.port).to eq 1234
     expect(instance.namespace).to eq "test"
   end

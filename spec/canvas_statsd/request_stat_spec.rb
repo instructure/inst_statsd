@@ -68,18 +68,18 @@ describe CanvasStatsd::RequestStat do
     end
   end
 
-  describe '#ms' do
+  describe '#total' do
     it 'correctly calcuates milliseconds from start, finish' do
       rs = create_subject({params: {}})
       # start and finish are in seconds
-      expect(rs.ms).to eq 1000
+      expect(rs.total).to eq 1000
     end
 
     it 'defaults to zero if either start or finish are nil' do
       rs = CanvasStatsd::RequestStat.new('name', nil, 1001, 1111, {params: {}})
-      expect(rs.ms).to eq 0
+      expect(rs.total).to eq 0
       rs = CanvasStatsd::RequestStat.new('name', 1, nil, 1111, {params: {}})
-      expect(rs.ms).to eq 0
+      expect(rs.total).to eq 0
     end
   end
 

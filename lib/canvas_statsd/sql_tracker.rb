@@ -12,7 +12,7 @@ module CanvasStatsd
     end
 
     def start
-      [read_counts, write_counts, cache_counts].each(&:start)
+      [read_counts, write_counts, cache_counts].map(&:start)
     end
 
     def track name, sql
@@ -27,16 +27,12 @@ module CanvasStatsd
       end
     end
 
-    def num_reads
-      read_counts.finalize_count
-    end
-
-    def num_writes
-      write_counts.finalize_count
-    end
-
-    def num_caches
-      cache_counts.finalize_count
+    def finalize_counts(cookies)
+      [
+        read_counts.finalize_count(cookies[0]),
+        write_counts.finalize_count(cookies[1]),
+        cache_counts.finalize_count(cookies[2])
+      ]
     end
 
     private

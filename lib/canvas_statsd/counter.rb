@@ -10,17 +10,15 @@ module CanvasStatsd
     end
 
     def start
-      Thread.current[key] = 0
+      Thread.current[key] ||= 0
     end
 
     def track(name)
       Thread.current[key] += 1 if Thread.current[key] && accepted_name?(name)
     end
 
-    def finalize_count
-      final_count = count
-      Thread.current[key] = 0
-      final_count
+    def finalize_count(cookie)
+      Thread.current[key] - cookie
     end
 
     def count

@@ -2,7 +2,7 @@ module CanvasStatsd
   class RequestLogger
 
     VALUES_MAP = {
-        total: :ms,
+        total: :total,
         view: :view_runtime,
         db: :db_runtime,
         sql_read: :sql_read_count,

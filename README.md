@@ -129,7 +129,29 @@ If you'd like CanvasStatsd to log the default metrics (as well as sending them t
 # log default metrics to environment logs in Rails
 CanvasStatsd::DefaultTracking.enable logger: Rails.logger
 ```
+## Block tracking
 
+You can easily track the performance of any block of code using all enabled
+counters. Just be careful that your key isn't too dynamic, causing performance problems
+for your statsd server.
+
+```ruby
+CanvasStatsd::BlockTracking.track("my_important_job") do
+  sleep(10)
+end
+```
+
+If you want to keep track of both exclusive and inclusive times for a re-entrant piece of code,
+you just need to tell CanvasStatsd which category to track along:
+
+```ruby
+CanvasStatsd::BlockTracking.track("my_important_job", category: :my_stuff) do
+  sleep(10)
+  CanvasStatsd::BlockTracking.track("my_other_important_job", category: :my_stuff) do
+    sleep(5)
+  end
+end
+```
 
 ## Contributing
 

@@ -7,16 +7,31 @@ describe CanvasStatsd::BlockTracking do
 
   it "works" do
     statsd = double()
-    expect(statsd).to receive(:timing).with("mykey.total", anything)
-    allow(statsd).to receive(:timing).with("mykey.test", anything)
-    allow(statsd).to receive(:timing).with("mykey.active_record", 0)
+    allow(statsd).to receive(:timing).with('mykey.total', anything)
     expect(statsd).to receive(:timing).with("mykey.sql.read", 1)
-    expect(statsd).to receive(:timing).with("mykey.sql.write", 0)
-    expect(statsd).to receive(:timing).with("mykey.sql.cache", 0)
-    allow(statsd).to receive(:timing).with("mykey.cache.read", 0)
 
-    CanvasStatsd::BlockTracking.track("mykey", statsd: statsd) do
+    CanvasStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
       ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+    end
+  end
+
+  it "keeps track of exclusive stats too" do
+    statsd = double()
+    expect(statsd).to receive(:timing).with("mykey.sql.read", 2).ordered
+    expect(statsd).to receive(:timing).with('mykey.total', anything).ordered
+    expect(statsd).to receive(:timing).with("mykey.exclusive.sql.read", 2).ordered
+    expect(statsd).to receive(:timing).with('mykey.exclusive.total', anything).ordered
+    expect(statsd).to receive(:timing).with("mykey.sql.read", 3).ordered
+    expect(statsd).to receive(:timing).with('mykey.total', anything).ordered
+    expect(statsd).to receive(:timing).with("mykey.exclusive.sql.read", 1).ordered
+    expect(statsd).to receive(:timing).with('mykey.exclusive.total', anything).ordered
+
+    CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
+      ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+      CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
+        ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+        ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+      end
     end
   end
 end

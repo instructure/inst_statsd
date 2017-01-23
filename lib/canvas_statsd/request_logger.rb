@@ -15,6 +15,9 @@ module CanvasStatsd
       request_stat.stats.each do |(name, value)|
         message += " (#{name.to_s.gsub('.', '_')}: #{"%.2f" % value})"
       end
+      request_stat.exclusive_stats&.each do |(name, value)|
+        message += " (exclusive_#{name.to_s.gsub('.', '_')}: #{"%.2f" % value})"
+      end
       message
     end
 

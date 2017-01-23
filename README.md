@@ -28,8 +28,6 @@ CanvasStatsd.settings = settings
 
 Values passed to `CanvasStatsd.settings` will be merged into and take precedence over any existing ENV vars
 
-
-
 ## Configuration Options
 
 Only the `host` (or `CANVAS_STATSD_HOST` ENV var) is required, all other config
@@ -69,7 +67,6 @@ hostname is `app01`, the final stat name of `my_stat` would be
 `canvas.my_stat.app01` (assuming the default statsd/graphite configuration)
 
 
-
 ## Usage
 
 Outside of configuration, app code generally interacts with the
@@ -95,16 +92,19 @@ will do nothing and return nil.
 
 ## Default Metrics Tracking
 
-CanvasStatsd ships with an opinionated default tracker that will capture
+CanvasStatsd ships with a default tracker that will capture
 several performance metrics per request. To enable this default metrics
 tracking in your rails app, create an initializer:
 
 ```ruby
 # config/initializers/canvas_statsd.rb
-CanvasStatsd.track_default_metrics
+CanvasStatsd::DefaultTracking.track_sql
+CanvasStatsd::DefaultTracking.track_cache
+CanvasStatsd::DefaultTracking.track_active_record
+CanvasStatsd::DefaultTracking.enable
 ```
 
-`CanvasStatsd.track_default_metrics` will track the following (as statsd
+This will track the following (as statsd
 timings) per request:
 
 | Metric Type   | Statsd key                      | Description                               |
@@ -123,21 +123,11 @@ timings) per request:
 
 \** as reported by [`aroi`](https://github.com/knomedia/aroi)
 
-You can disable the sql or active record stats by passing an optional hash to
-`track_default_metrics` with false values for `sql` or `active_record` keys (or
-both).  For example the following would track all of the above except
-`controller.action.active_record`:
-
-```ruby
-# don't track active_record
-CanvasStatsd.track_default_metrics active_record: false
-```
-
 If you'd like CanvasStatsd to log the default metrics (as well as sending them to statsd), pass a logger object along like so:
 
 ```ruby
 # log default metrics to environment logs in Rails
-CanvasStatsd.track_default_metrics logger: Rails.logger
+CanvasStatsd::DefaultTracking.enable logger: Rails.logger
 ```
 
 

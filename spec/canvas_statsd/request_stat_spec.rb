@@ -142,7 +142,7 @@ describe CanvasStatsd::RequestStat do
           }
         }
         @rs = create_subject(payload, @statsd)
-        @rs.cache_read_count = 25
+        @rs.stats['cache.read'] = 25
         expect(@statsd).to receive(:timing).with('request.foo.index.cache.read', 25)
       end
 
@@ -155,26 +155,11 @@ describe CanvasStatsd::RequestStat do
       end
 
       it 'sends sql_read_count when present' do
-        @rs.sql_read_count = 10
+        @rs.stats['sql.read'] = 10
         allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
         expect(@statsd).to receive(:timing).with('request.foo.index.sql.read', 10)
         @rs.report
       end
-
-      it 'sends sql_read_count when present' do
-        @rs.sql_write_count = 3
-        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
-        expect(@statsd).to receive(:timing).with('request.foo.index.sql.write', 3)
-        @rs.report
-      end
-
-      it 'sends sql_cache_count when present' do
-        @rs.sql_cache_count = 1
-        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
-        expect(@statsd).to receive(:timing).with('request.foo.index.sql.cache', 1)
-        @rs.report
-      end
-
     end
 
   end

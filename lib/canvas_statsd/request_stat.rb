@@ -16,11 +16,10 @@ module CanvasStatsd
     end
 
     def report
+      stats['total'] = total
+      stats['view'] = view_runtime if view_runtime
+      stats['db'] = db_runtime if db_runtime
       super
-      if common_key
-        @statsd.timing("#{common_key}.view", view_runtime) if view_runtime
-        @statsd.timing("#{common_key}.db", db_runtime) if db_runtime
-      end
     end
 
     def db_runtime

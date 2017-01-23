@@ -60,12 +60,6 @@ module CanvasStatsd
       end
       hash[key] = ['true', 'True', true].include?(value)
     end
-  
-    def track_default_request_metrics options={}
-      CanvasStatsd::RequestTracking.track_default_metrics options
-    end
-    # backcompat
-    alias track_default_metrics track_default_request_metrics
   end
 
 end

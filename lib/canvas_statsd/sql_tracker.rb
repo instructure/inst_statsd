@@ -6,9 +6,9 @@ module CanvasStatsd
     def initialize(opts=nil)
       opts ||= {}
       @blocked_names = opts.fetch(:blocked_names, [])
-      @read_counts = opts.fetch(:read_counter, CanvasStatsd::Counter.new('sql_read_counter'))
-      @write_counts = opts.fetch(:write_counter, CanvasStatsd::Counter.new('sql_write_counter'))
-      @cache_counts = opts.fetch(:cache_counter, CanvasStatsd::Counter.new('sql_cache_counter'))
+      @read_counts = opts.fetch(:read_counter, CanvasStatsd::Counter.new('sql.read'))
+      @write_counts = opts.fetch(:write_counter, CanvasStatsd::Counter.new('sql.write'))
+      @cache_counts = opts.fetch(:cache_counter, CanvasStatsd::Counter.new('sql.cache'))
     end
 
     def start

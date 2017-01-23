@@ -1,18 +1,6 @@
 module CanvasStatsd
   class RequestLogger
 
-    VALUES_MAP = {
-        total: :total,
-        view: :view_runtime,
-        db: :db_runtime,
-        sql_read: :sql_read_count,
-        sql_write: :sql_write_count,
-        sql_cache: :sql_cache_count,
-        active_record: :ar_count,
-        cache_read: :cache_read_count,
-      }.freeze
-
-
     def initialize(logger)
       @logger = logger || CanvasStatsd::NullLogger.new
     end
@@ -24,9 +12,8 @@ module CanvasStatsd
     def build_log_message(request_stat, header=nil)
       header ||= "STATSD"
       message = "[#{header}]"
-      VALUES_MAP.each do |k,v|
-        value = request_stat.respond_to?(v) ? request_stat.send(v) : nil
-        message += " (#{k}: #{"%.2f" % value})" if value
+      request_stat.stats.each do |(name, value)|
+        message += " (#{name.to_s.gsub('.', '_')}: #{"%.2f" % value})"
       end
       message
     end

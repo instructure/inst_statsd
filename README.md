@@ -92,16 +92,17 @@ will do nothing and return nil.
 
 ## Default Metrics Tracking
 
-CanvasStatsd ships with a default tracker that will capture
-several performance metrics per request. To enable this default metrics
-tracking in your rails app, create an initializer:
+CanvasStatsd ships with a several trackers that can capture
+several performance metrics. To enable these default metrics
+tracking in your rails app, you enable the ones you want, and
+then enable request tracking:
 
 ```ruby
 # config/initializers/canvas_statsd.rb
 CanvasStatsd::DefaultTracking.track_sql
 CanvasStatsd::DefaultTracking.track_cache
 CanvasStatsd::DefaultTracking.track_active_record
-CanvasStatsd::DefaultTracking.enable
+CanvasStatsd::RequestTrack.enable
 ```
 
 This will track the following (as statsd
@@ -123,19 +124,22 @@ timings) per request:
 
 \** as reported by [`aroi`](https://github.com/knomedia/aroi)
 
-If you'd like CanvasStatsd to log the default metrics (as well as sending them to statsd), pass a logger object along like so:
+If you'd like CanvasStatsd to log these metrics (as well as sending them to statsd), pass a logger object along like so:
 
 ```ruby
 # log default metrics to environment logs in Rails
-CanvasStatsd::DefaultTracking.enable logger: Rails.logger
+CanvasStatsd::RequestTracking.enable logger: Rails.logger
 ```
 ## Block tracking
 
 You can easily track the performance of any block of code using all enabled
-counters. Just be careful that your key isn't too dynamic, causing performance problems
+metrics. Just be careful that your key isn't too dynamic, causing performance problems
 for your statsd server.
 
 ```ruby
+CanvasStatsd::DefaultTracking.track_sql
+CanvasStatsd::DefaultTracking.track_cache
+CanvasStatsd::DefaultTracking.track_active_record
 CanvasStatsd::BlockTracking.track("my_important_job") do
   sleep(10)
 end

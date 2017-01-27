@@ -32,7 +32,7 @@ module CanvasStatsd
 
         result
       ensure
-        stack(category).pop if category && stack(category) == block_stat
+        stack(category).pop if category && stack(category).last == block_stat
       end
 
       private

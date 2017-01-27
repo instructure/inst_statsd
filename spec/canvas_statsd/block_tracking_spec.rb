@@ -21,13 +21,21 @@ describe CanvasStatsd::BlockTracking do
     expect(statsd).to receive(:timing).with('mykey.total', anything).ordered
     expect(statsd).to receive(:timing).with("mykey.exclusive.sql.read", 2).ordered
     expect(statsd).to receive(:timing).with('mykey.exclusive.total', anything).ordered
-    expect(statsd).to receive(:timing).with("mykey.sql.read", 3).ordered
+    expect(statsd).to receive(:timing).with("mykey.sql.read", 2).ordered
+    expect(statsd).to receive(:timing).with('mykey.total', anything).ordered
+    expect(statsd).to receive(:timing).with("mykey.exclusive.sql.read", 2).ordered
+    expect(statsd).to receive(:timing).with('mykey.exclusive.total', anything).ordered
+    expect(statsd).to receive(:timing).with("mykey.sql.read", 5).ordered
     expect(statsd).to receive(:timing).with('mykey.total', anything).ordered
     expect(statsd).to receive(:timing).with("mykey.exclusive.sql.read", 1).ordered
     expect(statsd).to receive(:timing).with('mykey.exclusive.total', anything).ordered
 
     CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
       ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+      CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
+        ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+        ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+      end
       CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
         ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
         ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}

@@ -77,7 +77,20 @@ module CanvasStatsd
       result
     end
 
+    def self.batch
+      return yield unless (old_instance = instance)
+      old_instance.batch do |batch|
+        Thread.current[:canvas_statsd] = batch
+        yield
+      end
+    ensure
+      Thread.current[:canvas_statsd] = old_instance
+    end
+
     def self.instance
+      thread_statsd = Thread.current[:canvas_statsd]
+      return thread_statsd if thread_statsd
+
       if !defined?(@statsd)
         statsd_settings = CanvasStatsd.settings
 
@@ -85,6 +98,7 @@ module CanvasStatsd
           @statsd = ::Statsd.new(statsd_settings[:host])
           @statsd.port = statsd_settings[:port] if statsd_settings[:port]
           @statsd.namespace = statsd_settings[:namespace] if statsd_settings[:namespace]
+          @statsd.batch_size = statsd_settings[:batch_size] if statsd_settings[:batch_size]
           @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
         else
           @statsd = nil
@@ -99,6 +113,7 @@ module CanvasStatsd
 
     def self.reset_instance
       remove_instance_variable(:@statsd) if defined?(@statsd)
+      Thread.current[:canvas_statsd] = nil
     end
   end
 end

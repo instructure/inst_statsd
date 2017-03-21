@@ -73,6 +73,27 @@ describe CanvasStatsd::Statsd do
     expect(instance.namespace).to eq "test"
   end
 
+  describe ".batch" do
+    it "is properly reentrant" do
+      CanvasStatsd.settings = { :host => "localhost", :namespace => "test", :port => 1234 }
+      CanvasStatsd::Statsd.reset_instance
+
+      statsd = CanvasStatsd::Statsd.instance
+      CanvasStatsd::Statsd.batch do
+        batch1 = CanvasStatsd::Statsd.instance
+        CanvasStatsd::Statsd.batch do
+          batch2 = CanvasStatsd::Statsd.instance
+          expect(statsd).to be_a ::Statsd
+          expect(batch1).to be_a ::Statsd::Batch
+          expect(batch2).to be_a ::Statsd::Batch
+          expect(batch1).not_to eq batch2
+        end
+        expect(CanvasStatsd::Statsd.instance).to eq batch1
+      end
+      expect(CanvasStatsd::Statsd.instance).to eq statsd
+    end
+  end
+
   describe ".escape" do
     it "replaces any dots in str with a _ when no replacment given" do
       result = CanvasStatsd::Statsd.escape("lots.of.dots")

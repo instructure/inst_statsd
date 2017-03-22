@@ -42,4 +42,37 @@ describe CanvasStatsd::BlockTracking do
       end
     end
   end
+
+  context "mask" do
+    after do
+      CanvasStatsd::BlockTracking.mask = nil
+      CanvasStatsd::BlockTracking.negative_mask = nil
+    end
+
+    it "only tracks keys that match the mask" do
+      CanvasStatsd::BlockTracking.mask = /mykey/
+      statsd = double()
+      allow(statsd).to receive(:timing).with('mykey.total', anything)
+      expect(statsd).to receive(:timing).with("mykey.sql.read", 1)
+
+      CanvasStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
+        CanvasStatsd::BlockTracking.track("ignoreme", statsd: statsd, only: 'sql.read') do
+          ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+        end
+      end
+    end
+
+    it "doesn't track keys that match the negative mask" do
+      CanvasStatsd::BlockTracking.negative_mask = /ignoreme/
+      statsd = double()
+      allow(statsd).to receive(:timing).with('mykey.total', anything)
+      expect(statsd).to receive(:timing).with("mykey.sql.read", 1)
+
+      CanvasStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
+        CanvasStatsd::BlockTracking.track("ignoreme", statsd: statsd, only: 'sql.read') do
+          ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
+        end
+      end
+    end
+  end
 end

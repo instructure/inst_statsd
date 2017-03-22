@@ -1,7 +1,7 @@
 require 'statsd'
 
 module CanvasStatsd
-  VALID_SETTINGS = [:host, :port, :namespace, :append_hostname]
+  VALID_SETTINGS = [:host, :port, :namespace, :append_hostname, :mask, :negative_mask]
 
   class ConfigurationError < StandardError; end
 
@@ -18,7 +18,7 @@ module CanvasStatsd
 
   class << self
     def settings
-      @settings || env_settings
+      @settings ||= env_settings
     end
   
     def settings=(value)
@@ -33,6 +33,7 @@ module CanvasStatsd
         if !VALID_SETTINGS.include?(k.to_sym)
           raise CanvasStatsd::ConfigurationError, "Invalid key: #{k}"
         end
+        v = Regexp.new(v) if [:mask, :negative_mask].include?(k.to_sym) && v.is_a?(String)
         validated[k.to_sym] = v
       end
   

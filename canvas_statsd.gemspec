@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "canvas_statsd"
-  spec.version       = "2.0.1"
+  spec.version       = "2.0.2"
   spec.authors       = ["Nick Cloward", "Jason Madsen"]
   spec.email         = ["ncloward@instructure.com", "jmadsen@instructure.com"]
   spec.summary       = %q{Statsd for Canvas}

@@ -1,7 +1,7 @@
 require 'statsd'
 
 module CanvasStatsd
-  VALID_SETTINGS = [:host, :port, :namespace, :append_hostname, :mask, :negative_mask]
+  VALID_SETTINGS = [:host, :port, :namespace, :append_hostname, :mask, :negative_mask, :batch_size, :batch_byte_size]
 
   class ConfigurationError < StandardError; end
 

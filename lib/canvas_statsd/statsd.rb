@@ -98,7 +98,8 @@ module CanvasStatsd
           @statsd = ::Statsd.new(statsd_settings[:host])
           @statsd.port = statsd_settings[:port] if statsd_settings[:port]
           @statsd.namespace = statsd_settings[:namespace] if statsd_settings[:namespace]
-          @statsd.batch_size = statsd_settings[:batch_size] if statsd_settings[:batch_size]
+          @statsd.batch_size = statsd_settings[:batch_size] if statsd_settings.key?(:batch_size)
+          @statsd.batch_byte_size = statsd_settings[:batch_byte_size] if statsd_settings.key?(:batch_byte_size)
           @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
         else
           @statsd = nil

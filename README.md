@@ -102,7 +102,7 @@ then enable request tracking:
 CanvasStatsd::DefaultTracking.track_sql
 CanvasStatsd::DefaultTracking.track_cache
 CanvasStatsd::DefaultTracking.track_active_record
-CanvasStatsd::RequestTrack.enable
+CanvasStatsd::RequestTracking.enable
 ```
 
 This will track the following (as statsd

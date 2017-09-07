@@ -1,21 +1,3 @@
-#
-# Copyright (C) 2012 Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-
 # Proxy class to communicate messages to statsd
 # Available statsd messages are described in:
 #   https://github.com/etsy/statsd/blob/master/README.md
@@ -23,7 +5,7 @@
 #
 # So for instance:
 #   ms = Benchmark.ms { ..code.. }
-#   CanvasStatsd::Statsd.timing("my_stat", ms)
+#   InstStatsd::Statsd.timing("my_stat", ms)
 #
 # Configured in config/statsd.yml, see config/statsd.yml.example
 # At least a host needs to be defined for the environment, all other config is optional
@@ -33,21 +15,21 @@
 # So if the namespace is "canvas" and the hostname is "app01", the final stat name of "my_stat" would be "stats.canvas.my_stat.app01"
 # (assuming the default statsd/graphite configuration)
 #
-# If statsd isn't configured and enabled, then calls to CanvasStatsd::Statsd.* will do nothing and return nil
+# If statsd isn't configured and enabled, then calls to InstStatsd::Statsd.* will do nothing and return nil
 
-module CanvasStatsd
+module InstStatsd
   module Statsd
     # replace "." in key names with another character to avoid creating spurious sub-folders in graphite
     def self.escape(str, replacement = '_')
-      str.respond_to?(:gsub)? str.gsub('.', replacement) : str
+      str.respond_to?(:gsub) ? str.gsub('.', replacement) : str
     end
 
     def self.hostname
-      @hostname ||= Socket.gethostname.split(".").first
+      @hostname ||= Socket.gethostname.split('.').first
     end
 
-    %w(increment decrement count gauge timing).each do |method|
-      class_eval <<-RUBY, __FILE__, __LINE__+1
+    %w[increment decrement count gauge timing].each do |method|
+      class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def self.#{method}(stat, *args)
         if self.instance
           if Array === stat
@@ -70,29 +52,29 @@ module CanvasStatsd
       RUBY
     end
 
-    def self.time(stat, sample_rate=1)
+    def self.time(stat, sample_rate = 1)
       start = Time.now
       result = yield
-      self.timing(stat, ((Time.now - start) * 1000).round, sample_rate)
+      timing(stat, ((Time.now - start) * 1000).round, sample_rate)
       result
     end
 
     def self.batch
       return yield unless (old_instance = instance)
       old_instance.batch do |batch|
-        Thread.current[:canvas_statsd] = batch
+        Thread.current[:inst_statsd] = batch
         yield
       end
     ensure
-      Thread.current[:canvas_statsd] = old_instance
+      Thread.current[:inst_statsd] = old_instance
     end
 
     def self.instance
-      thread_statsd = Thread.current[:canvas_statsd]
+      thread_statsd = Thread.current[:inst_statsd]
       return thread_statsd if thread_statsd
 
-      if !defined?(@statsd)
-        statsd_settings = CanvasStatsd.settings
+      unless defined?(@statsd)
+        statsd_settings = InstStatsd.settings
 
         if statsd_settings && statsd_settings[:host]
           @statsd = ::Statsd.new(statsd_settings[:host])
@@ -114,7 +96,7 @@ module CanvasStatsd
 
     def self.reset_instance
       remove_instance_variable(:@statsd) if defined?(@statsd)
-      Thread.current[:canvas_statsd] = nil
+      Thread.current[:inst_statsd] = nil
     end
   end
 end

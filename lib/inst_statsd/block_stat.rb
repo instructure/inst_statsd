@@ -1,10 +1,10 @@
-module CanvasStatsd
+module InstStatsd
   class BlockStat
 
     attr_accessor :stats
     attr_accessor :common_key
 
-    def initialize(common_key, statsd=CanvasStatsd::Statsd)
+    def initialize(common_key, statsd=InstStatsd::Statsd)
       self.common_key = common_key
       @statsd = statsd
       @stats = {}

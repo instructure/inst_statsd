@@ -1,6 +1,6 @@
-module CanvasStatsd
+module InstStatsd
   class RequestStat < BlockStat
-    def initialize(name, start, finish, id, payload, statsd=CanvasStatsd::Statsd)
+    def initialize(name, start, finish, id, payload, statsd=InstStatsd::Statsd)
       super(nil, statsd)
       @name = name
       @start = start

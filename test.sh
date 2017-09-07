@@ -1,7 +1,7 @@
 #!/bin/bash
 result=0
 
-echo "################ canvas_statsd ################"
+echo "################ inst_statsd ################"
 echo "################ Running tests against Rails 3 ################"
 bundle check || bundle install
 bundle exec rspec spec

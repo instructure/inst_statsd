@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module CanvasStatsd
+module InstStatsd
   describe SqlTracker do
 
     describe '#start' do

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe CanvasStatsd::Counter do
+describe InstStatsd::Counter do
 
-  let(:subject) { CanvasStatsd::Counter.new('test', ['foo']) }
+  let(:subject) { InstStatsd::Counter.new('test', ['foo']) }
 
   describe "#accepted_name?" do
     it 'should return true for names not in blocked_names' do

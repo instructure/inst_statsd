@@ -4,11 +4,11 @@ require 'spec_helper'
 def create_subject(payload={}, statsd=nil)
   args = ['name', 1000, 1001, 1234, payload]
   args << statsd if statsd
-  CanvasStatsd::RequestStat.new(*args)
+  InstStatsd::RequestStat.new(*args)
 end
 
 
-describe CanvasStatsd::RequestStat do
+describe InstStatsd::RequestStat do
 
   describe '#db_runtime' do
     it 'should return the payload db_runtime' do
@@ -76,9 +76,9 @@ describe CanvasStatsd::RequestStat do
     end
 
     it 'defaults to zero if either start or finish are nil' do
-      rs = CanvasStatsd::RequestStat.new('name', nil, 1001, 1111, {params: {}})
+      rs = InstStatsd::RequestStat.new('name', nil, 1001, 1111, {params: {}})
       expect(rs.total).to eq 0
-      rs = CanvasStatsd::RequestStat.new('name', 1, nil, 1111, {params: {}})
+      rs = InstStatsd::RequestStat.new('name', 1, nil, 1111, {params: {}})
       expect(rs.total).to eq 0
     end
   end

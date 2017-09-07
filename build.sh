@@ -3,7 +3,7 @@
 set -e
 
 # build container
-docker build -t canvas_statsd .
+docker build -t inst_statsd .
 
 # run the tests
-docker run --rm canvas_statsd bundle exec rspec spec
+docker run --rm inst_statsd bundle exec rspec spec

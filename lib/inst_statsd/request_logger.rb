@@ -1,8 +1,8 @@
-module CanvasStatsd
+module InstStatsd
   class RequestLogger
 
     def initialize(logger)
-      @logger = logger || CanvasStatsd::NullLogger.new
+      @logger = logger || InstStatsd::NullLogger.new
     end
 
     def log(request_stat, header=nil)

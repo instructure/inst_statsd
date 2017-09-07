@@ -1,4 +1,4 @@
-module CanvasStatsd
+module InstStatsd
   class RequestTracking
 
     def self.enable(logger: nil)
@@ -18,7 +18,7 @@ module CanvasStatsd
     end
 
     def self.finalize_processing *args
-      request_stat = CanvasStatsd::RequestStat.new(*args)
+      request_stat = InstStatsd::RequestStat.new(*args)
       request_stat.stats = @cookies.map { |(name, cookie)| [name, Counter.counters[name].finalize_count(cookie)] }.to_h
       request_stat.report
       @logger.log(request_stat)

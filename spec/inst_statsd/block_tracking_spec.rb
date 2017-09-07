@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe CanvasStatsd::BlockTracking do
+describe InstStatsd::BlockTracking do
   before(:all) do
-    CanvasStatsd::DefaultTracking.track_sql
+    InstStatsd::DefaultTracking.track_sql
   end
 
   it "works" do
@@ -10,7 +10,7 @@ describe CanvasStatsd::BlockTracking do
     allow(statsd).to receive(:timing).with('mykey.total', anything)
     expect(statsd).to receive(:timing).with("mykey.sql.read", 1)
 
-    CanvasStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
+    InstStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
       ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
     end
   end
@@ -30,13 +30,13 @@ describe CanvasStatsd::BlockTracking do
     expect(statsd).to receive(:timing).with("mykey.exclusive.sql.read", 1).ordered
     expect(statsd).to receive(:timing).with('mykey.exclusive.total', anything).ordered
 
-    CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
+    InstStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
       ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
-      CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
+      InstStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
         ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
         ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
       end
-      CanvasStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
+      InstStatsd::BlockTracking.track("mykey", category: :nested, statsd: statsd, only: 'sql.read') do
         ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
         ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
       end
@@ -45,31 +45,31 @@ describe CanvasStatsd::BlockTracking do
 
   context "mask" do
     after do
-      CanvasStatsd::BlockTracking.mask = nil
-      CanvasStatsd::BlockTracking.negative_mask = nil
+      InstStatsd::BlockTracking.mask = nil
+      InstStatsd::BlockTracking.negative_mask = nil
     end
 
     it "only tracks keys that match the mask" do
-      CanvasStatsd::BlockTracking.mask = /mykey/
+      InstStatsd::BlockTracking.mask = /mykey/
       statsd = double()
       allow(statsd).to receive(:timing).with('mykey.total', anything)
       expect(statsd).to receive(:timing).with("mykey.sql.read", 1)
 
-      CanvasStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
-        CanvasStatsd::BlockTracking.track("ignoreme", statsd: statsd, only: 'sql.read') do
+      InstStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
+        InstStatsd::BlockTracking.track("ignoreme", statsd: statsd, only: 'sql.read') do
           ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
         end
       end
     end
 
     it "doesn't track keys that match the negative mask" do
-      CanvasStatsd::BlockTracking.negative_mask = /ignoreme/
+      InstStatsd::BlockTracking.negative_mask = /ignoreme/
       statsd = double()
       allow(statsd).to receive(:timing).with('mykey.total', anything)
       expect(statsd).to receive(:timing).with("mykey.sql.read", 1)
 
-      CanvasStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
-        CanvasStatsd::BlockTracking.track("ignoreme", statsd: statsd, only: 'sql.read') do
+      InstStatsd::BlockTracking.track("mykey", statsd: statsd, only: 'sql.read') do
+        InstStatsd::BlockTracking.track("ignoreme", statsd: statsd, only: 'sql.read') do
           ActiveSupport::Notifications.instrument('sql.active_record', name: "LOAD", sql: "SELECT * FROM users") {}
         end
       end

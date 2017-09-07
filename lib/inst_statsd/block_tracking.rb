@@ -1,6 +1,6 @@
 require 'benchmark'
 
-module CanvasStatsd
+module InstStatsd
   class BlockTracking
     class << self
       attr_accessor :logger
@@ -8,16 +8,16 @@ module CanvasStatsd
       [:mask, :negative_mask].each do |method|
         class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def #{method}
-            CanvasStatsd.settings[:#{method}]
+            InstStatsd.settings[:#{method}]
           end
 
           def #{method}=(value)
-            CanvasStatsd.settings[:#{method}] = value
+            InstStatsd.settings[:#{method}] = value
           end
         RUBY
       end
 
-      def track(key, category: nil, statsd: CanvasStatsd::Statsd, only: nil)
+      def track(key, category: nil, statsd: InstStatsd::Statsd, only: nil)
         return yield if mask && mask !~ key
         return yield if negative_mask && negative_mask =~ key
 
@@ -26,7 +26,7 @@ module CanvasStatsd
                   else
                     Counter.counters.map { |(name, counter)| [name, counter.start] }
                   end
-        block_stat = CanvasStatsd::BlockStat.new(key, statsd)
+        block_stat = InstStatsd::BlockStat.new(key, statsd)
         stack(category).push(block_stat) if category
 
         result = nil

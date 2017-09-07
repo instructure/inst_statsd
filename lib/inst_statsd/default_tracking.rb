@@ -1,10 +1,10 @@
 require "active_support"
 
-module CanvasStatsd
+module InstStatsd
   class DefaultTracking
     def self.track_sql
       return if @sql_tracker
-      @sql_tracker = CanvasStatsd::SqlTracker.new(blocked_names: ['SCHEMA'])
+      @sql_tracker = InstStatsd::SqlTracker.new(blocked_names: ['SCHEMA'])
       ActiveSupport::Notifications.subscribe(/sql\.active_record/) {|*args| update_sql_count(*args)}
     end
 
@@ -13,14 +13,14 @@ module CanvasStatsd
       require 'aroi'
 
       ::Aroi::Instrumentation.instrument_creation!
-      @ar_counter = CanvasStatsd::Counter.new('active_record')
+      @ar_counter = InstStatsd::Counter.new('active_record')
       ActiveSupport::Notifications.subscribe(/instance\.active_record/) {|*args| update_active_record_count(*args)}
     end
 
     def self.track_cache
       return if @cache_read_counter
 
-      @cache_read_counter = CanvasStatsd::Counter.new('cache.read')
+      @cache_read_counter = InstStatsd::Counter.new('cache.read')
       ActiveSupport::Notifications.subscribe(/cache_read\.active_support/) {|*args| update_cache_read_count(*args)}
     end
 

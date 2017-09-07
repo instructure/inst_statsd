@@ -1,6 +1,6 @@
 require 'logger'
 
-module CanvasStatsd
+module InstStatsd
   class NullLogger < Logger
     def initialize(*args)
     end

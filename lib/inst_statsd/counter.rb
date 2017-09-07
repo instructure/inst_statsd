@@ -1,4 +1,4 @@
-module CanvasStatsd
+module InstStatsd
   class Counter
     class << self
       def counters

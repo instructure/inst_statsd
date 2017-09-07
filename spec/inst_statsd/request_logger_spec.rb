@@ -1,11 +1,11 @@
 require 'spec_helper'
 require 'logger'
 
-describe CanvasStatsd::RequestLogger do
+describe InstStatsd::RequestLogger do
 
   describe '#build_log_message' do
     before :all do
-      @logger = CanvasStatsd::RequestLogger.new(Logger.new(STDOUT))
+      @logger = InstStatsd::RequestLogger.new(Logger.new(STDOUT))
     end
     it 'includes the supplied header' do
       request_stat = double('request_stat')
@@ -68,7 +68,7 @@ describe CanvasStatsd::RequestLogger do
   describe '#log' do
     it 'sends info method to logger if logger exists' do
       std_out_logger = Logger.new(STDOUT)
-      logger = CanvasStatsd::RequestLogger.new(std_out_logger)
+      logger = InstStatsd::RequestLogger.new(std_out_logger)
       expect(std_out_logger).to receive(:info)
       request_stat = double('request_stat')
       allow(request_stat).to receive(:stats).and_return({})
@@ -77,7 +77,7 @@ describe CanvasStatsd::RequestLogger do
     end
     it 'sends info method with build_log_message output if logger exists' do
       std_out_logger = Logger.new(STDOUT)
-      logger = CanvasStatsd::RequestLogger.new(std_out_logger)
+      logger = InstStatsd::RequestLogger.new(std_out_logger)
       expect(std_out_logger).to receive(:info).with("[DEFAULT_METRICS] (total: 100.20)")
       request_stat = double('request_stat')
       allow(request_stat).to receive(:stats).and_return(total: 100.2)

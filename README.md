@@ -1,4 +1,4 @@
-# CanvasStatsd
+# InstStatsd
 
 configurable statsd client proxy
 
@@ -7,13 +7,13 @@ configurable statsd client proxy
 Set a few enviroment variables:
 
 ```bash
-export CANVAS_STATSD_HOST=statsd.example.org
-export CANVAS_STATSD_PORT=1234
-export CANVAS_STATSD_NAMESPACE=my_app.prod
-export CANVAS_STATSD_APPEND_HOSTNAME=false
+export INST_STATSD_HOST=statsd.example.org
+export INST_STATSD_PORT=1234
+export INST_STATSD_NAMESPACE=my_app.prod
+export INST_STATSD_APPEND_HOSTNAME=false
 ```
 
-Or pass a hash to `CanvasStatsd.settings`
+Or pass a hash to `InstStatsd.settings`
 
 ```ruby
 settings = {
@@ -23,14 +23,14 @@ settings = {
   append_hostname: false
 }
 
-CanvasStatsd.settings = settings
+InstStatsd.settings = settings
 ```
 
-Values passed to `CanvasStatsd.settings` will be merged into and take precedence over any existing ENV vars
+Values passed to `InstStatsd.settings` will be merged into and take precedence over any existing ENV vars
 
 ## Configuration Options
 
-Only the `host` (or `CANVAS_STATSD_HOST` ENV var) is required, all other config
+Only the `host` (or `INST_STATSD_HOST` ENV var) is required, all other config
 is optional
 
 ##### `host`
@@ -51,9 +51,9 @@ settings = {
   namespace: 'my_app.prod'
 }
 
-CanvasStatsd.settings = settings
+InstStatsd.settings = settings
 
-CanvasStatsd::Statsd.timing('some.stat', 300)
+InstStatsd::Statsd.timing('some.stat', 300)
 ```
 
 would use `my_app.prod.some.stat` as it's stat name.
@@ -70,7 +70,7 @@ hostname is `app01`, the final stat name of `my_stat` would be
 ## Usage
 
 Outside of configuration, app code generally interacts with the
-`CanvasStatsd::Statsd` object, which is a proxy class to communicate messages
+`InstStatsd::Statsd` object, which is a proxy class to communicate messages
 to statsd.
 
 Available statsd messages are described in:
@@ -82,27 +82,27 @@ So for instance:
 
 ```ruby
 ms = Benchmark.ms { ..code.. }
-CanvasStatsd::Statsd.timing("my_stat", ms)
+InstStatsd::Statsd.timing("my_stat", ms)
 ```
 
-If statsd isn't configured and enabled, then calls to `CanvasStatsd::Statsd.*`
+If statsd isn't configured and enabled, then calls to `InstStatsd::Statsd.*`
 will do nothing and return nil.
 
 
 
 ## Default Metrics Tracking
 
-CanvasStatsd ships with a several trackers that can capture
+InstStatsd ships with a several trackers that can capture
 several performance metrics. To enable these default metrics
 tracking in your rails app, you enable the ones you want, and
 then enable request tracking:
 
 ```ruby
-# config/initializers/canvas_statsd.rb
-CanvasStatsd::DefaultTracking.track_sql
-CanvasStatsd::DefaultTracking.track_cache
-CanvasStatsd::DefaultTracking.track_active_record
-CanvasStatsd::RequestTracking.enable
+# config/initializers/inst_statsd.rb
+InstStatsd::DefaultTracking.track_sql
+InstStatsd::DefaultTracking.track_cache
+InstStatsd::DefaultTracking.track_active_record
+InstStatsd::RequestTracking.enable
 ```
 
 This will track the following (as statsd
@@ -124,11 +124,11 @@ timings) per request:
 
 \** as reported by [`aroi`](https://github.com/knomedia/aroi)
 
-If you'd like CanvasStatsd to log these metrics (as well as sending them to statsd), pass a logger object along like so:
+If you'd like InstStatsd to log these metrics (as well as sending them to statsd), pass a logger object along like so:
 
 ```ruby
 # log default metrics to environment logs in Rails
-CanvasStatsd::RequestTracking.enable logger: Rails.logger
+InstStatsd::RequestTracking.enable logger: Rails.logger
 ```
 ## Block tracking
 
@@ -137,21 +137,21 @@ metrics. Just be careful that your key isn't too dynamic, causing performance pr
 for your statsd server.
 
 ```ruby
-CanvasStatsd::DefaultTracking.track_sql
-CanvasStatsd::DefaultTracking.track_cache
-CanvasStatsd::DefaultTracking.track_active_record
-CanvasStatsd::BlockTracking.track("my_important_job") do
+InstStatsd::DefaultTracking.track_sql
+InstStatsd::DefaultTracking.track_cache
+InstStatsd::DefaultTracking.track_active_record
+InstStatsd::BlockTracking.track("my_important_job") do
   sleep(10)
 end
 ```
 
 If you want to keep track of both exclusive and inclusive times for a re-entrant piece of code,
-you just need to tell CanvasStatsd which category to track along:
+you just need to tell InstStatsd which category to track along:
 
 ```ruby
-CanvasStatsd::BlockTracking.track("my_important_job", category: :my_stuff) do
+InstStatsd::BlockTracking.track("my_important_job", category: :my_stuff) do
   sleep(10)
-  CanvasStatsd::BlockTracking.track("my_other_important_job", category: :my_stuff) do
+  InstStatsd::BlockTracking.track("my_other_important_job", category: :my_stuff) do
     sleep(5)
   end
 end

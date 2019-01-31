@@ -1,7 +1,8 @@
 require 'statsd'
 
 module InstStatsd
-  VALID_SETTINGS = %i[host port namespace append_hostname mask negative_mask batch_size batch_byte_size].freeze
+  VALID_SETTINGS = %i[host port namespace append_hostname mask negative_mask batch_size batch_byte_size
+                      dog_tags].freeze
 
   class ConfigurationError < StandardError; end
 
@@ -45,11 +46,18 @@ module InstStatsd
         host: env.fetch('INST_STATSD_HOST', nil),
         port: env.fetch('INST_STATSD_PORT', nil),
         namespace: env.fetch('INST_STATSD_NAMESPACE', nil),
-        append_hostname: env.fetch('INST_STATSD_APPEND_HOSTNAME', nil)
+        append_hostname: env.fetch('INST_STATSD_APPEND_HOSTNAME', nil),
+        dog_tags: env.fetch('INST_DOG_TAGS', nil)
       }
       config.delete_if { |_k, v| v.nil? }
       convert_bool(config, :append_hostname)
-      config[:host] ? config : {}
+      if config[:host]
+        config
+      elsif config[:dog_tags]
+        config
+      else
+        {}
+      end
     end
 
     def convert_bool(hash, key)

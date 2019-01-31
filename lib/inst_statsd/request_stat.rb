@@ -7,12 +7,20 @@ module InstStatsd
       @finish = finish
       @id = id
       @payload = payload
+      @statsd  = statsd
     end
 
     def common_key
       common_key = super
       return common_key if common_key
-      self.common_key = "request.#{controller}.#{action}" if controller && action
+      if @statsd.data_dog?
+        self.common_key = "request"
+        self.short_stat = "request"
+        self.tags[:controller] = controller if controller
+        self.tags[:action] = action if action
+      else
+        self.common_key = "request.#{controller}.#{action}" if controller && action
+      end
     end
 
     def report

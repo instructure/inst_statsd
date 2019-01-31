@@ -11,6 +11,7 @@ describe InstStatsd do
       'INST_STATSD_NAMESPACE',
       'INST_STATSD_PORT',
       'INST_STATSD_APPEND_HOST_NAME',
+      'INST_DOG_TAGS'
     ].each {|k| ENV.delete k}
   end
 
@@ -109,6 +110,23 @@ describe InstStatsd do
         'INST_STATSD_NAMESPACE' => 'canvas'
       }
       expect(InstStatsd.env_settings(env)).to eq({})
+    end
+
+    it 'returns empty hash when missing dog tags' do
+      env = {
+        'INST_DOG_API_KEY' => 'SEKRET KEY'
+      }
+      expect(InstStatsd.env_settings(env)).to eq({})
+    end
+
+    it 'builds settings hash with dog environment vars' do
+      env = {
+        'INST_DOG_TAGS' => {app: 'canvas', env: 'prod'},
+      }
+      expected = {
+        dog_tags: {app: 'canvas', env: 'prod'},
+      }
+      expect(InstStatsd.env_settings(env)).to eq(expected)
     end
 
     it 'builds settings hash from environment vars' do

@@ -30,8 +30,11 @@ Values passed to `InstStatsd.settings` will be merged into and take precedence o
 
 ## Configuration Options
 
-Only the `host` (or `INST_STATSD_HOST` ENV var) is required, all other config
-is optional
+For statsd only the `host` (or `INST_STATSD_HOST` ENV var) is required, all
+other config are optional.
+For data dog, only the `dog_tags` (or `INST_DOG_TAGS` ENV vars) are required.
+All others are optional. Having `dog_tags` is how to know to use data_dog.
+A `{}` can be passed if you have no desired default tags.
 
 ##### `host`
 
@@ -66,6 +69,12 @@ The hostname of the server will be appended to the stat name, unless
 hostname is `app01`, the final stat name of `my_stat` would be
 `canvas.my_stat.app01` (assuming the default statsd/graphite configuration)
 
+##### `dog_tags`
+
+These are the default tags for the application. Since we do not use the host for
+tags, this allows us to separate different apps and view metrics for one app.
+The tags are a hash. Example `{app: canvas, environment: production}`
+Data dog charges metrics based on unique combination of tags.
 
 ## Usage
 

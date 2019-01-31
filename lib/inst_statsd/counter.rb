@@ -13,7 +13,7 @@ module InstStatsd
     attr_reader :key
     attr_reader :blocked_names
 
-    def initialize(key, blocked_names=[])
+    def initialize(key, blocked_names=[], tags: {}, short_stat: nil)
       @blocked_names = blocked_names
       @key = key
       @tls_key = "statsd.#{key}"

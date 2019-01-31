@@ -3,9 +3,14 @@ module InstStatsd
 
     attr_accessor :stats
     attr_accessor :common_key
+    attr_accessor :short_stat
+    attr_accessor :tags
 
-    def initialize(common_key, statsd=InstStatsd::Statsd)
+    def initialize(common_key, statsd=InstStatsd::Statsd, tags: {}, short_stat: nil)
       self.common_key = common_key
+      @tags = tags
+      @short_stat = short_stat
+      @short_stat ||= common_key
       @statsd = statsd
       @stats = {}
     end
@@ -26,10 +31,10 @@ module InstStatsd
     def report
       if common_key
         stats.each do |(key, value)|
-          @statsd.timing("#{common_key}.#{key}", value)
+          @statsd.timing("#{common_key}.#{key}", value, tags: @tags, short_stat: "#{@short_stat}.#{key}")
         end
         exclusive_stats&.each do |(key, value)|
-          @statsd.timing("#{common_key}.exclusive.#{key}", value)
+          @statsd.timing("#{common_key}.exclusive.#{key}", value, tags: @tags, short_stat: "#{@short_stat}.exclusive.#{key}")
         end
       end
     end

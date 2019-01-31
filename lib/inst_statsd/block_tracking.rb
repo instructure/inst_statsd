@@ -17,7 +17,7 @@ module InstStatsd
         RUBY
       end
 
-      def track(key, category: nil, statsd: InstStatsd::Statsd, only: nil)
+      def track(key, category: nil, statsd: InstStatsd::Statsd, only: nil, tags: {}, short_stat: nil)
         return yield if mask && mask !~ key
         return yield if negative_mask && negative_mask =~ key
 
@@ -26,7 +26,7 @@ module InstStatsd
                   else
                     Counter.counters.map { |(name, counter)| [name, counter.start] }
                   end
-        block_stat = InstStatsd::BlockStat.new(key, statsd)
+        block_stat = InstStatsd::BlockStat.new(key, statsd, tags: tags, short_stat: short_stat)
         stack(category).push(block_stat) if category
 
         result = nil

@@ -69,7 +69,7 @@ describe InstStatsd::RequestStat do
   end
 
   describe '#total' do
-    it 'correctly calcuates milliseconds from start, finish' do
+    it 'correctly calculates milliseconds from start, finish' do
       rs = create_subject({params: {}})
       # start and finish are in seconds
       expect(rs.total).to eq 1000
@@ -85,14 +85,14 @@ describe InstStatsd::RequestStat do
 
   describe '#report' do
     it 'doesnt send stats when no controller or action' do
-      statsd = double
+      statsd = InstStatsd::Statsd
       rs = create_subject({params: {}}, statsd)
-      expect(statsd).to_not receive(:timing).with('request.foo.index', 1000)
+      expect(statsd).to_not receive(:timing).with('request.foo.index', 1000, {short_stat: nil, tags: {}})
       rs.report
     end
 
     it 'sends total timing when controller && action are present, doesnt send db, or view if they are not' do
-      statsd = double
+      statsd = InstStatsd::Statsd
       payload = {
         params: {
           'controller' => 'foo',
@@ -100,12 +100,26 @@ describe InstStatsd::RequestStat do
         }
       }
       rs = create_subject(payload, statsd)
-      expect(statsd).to receive(:timing).with('request.foo.index.total', 1000)
+      expect(statsd).to receive(:timing).with('request.foo.index.total', 1000, {short_stat: ".total", tags: {}})
+      rs.report
+    end
+
+    it 'sends total timing when controller && action are present as tags for data dog' do
+      statsd = InstStatsd::Statsd
+      expect(statsd).to receive(:data_dog?).and_return true
+      payload = {
+        params: {
+          'controller' => 'foo',
+          'action'     => 'index'
+        }
+      }
+      rs = create_subject(payload, statsd)
+      expect(statsd).to receive(:timing).with('request.total', 1000, {short_stat: 'request.total', tags: {action: "index", controller: "foo"}} )
       rs.report
     end
 
     it 'sends view_runtime and db_runtime when present' do
-      statsd = double
+      statsd = InstStatsd::Statsd
       payload = {
         view_runtime: 70.1,
         db_runtime: 100.2,
@@ -115,14 +129,14 @@ describe InstStatsd::RequestStat do
         }
       }
       rs = create_subject(payload, statsd)
-      allow(statsd).to receive(:timing).with('request.foo.index.total', 1000)
-      expect(statsd).to receive(:timing).with('request.foo.index.view', 70.1)
-      expect(statsd).to receive(:timing).with('request.foo.index.db', 100.2)
+      allow(statsd).to receive(:timing).with('request.foo.index.total', 1000, {short_stat: ".total", tags: {}})
+      expect(statsd).to receive(:timing).with('request.foo.index.view', 70.1, {short_stat: ".view", tags: {}})
+      expect(statsd).to receive(:timing).with('request.foo.index.db', 100.2, {short_stat: ".db", tags: {}})
       rs.report
     end
 
     it 'sends cache_read_count when present' do
-      statsd = double
+      statsd = InstStatsd::Statsd
       payload = {
         params: {
           'controller' => 'foo',
@@ -134,7 +148,7 @@ describe InstStatsd::RequestStat do
     describe 'sql stats' do
 
       before :each do
-        @statsd = double
+        @statsd = InstStatsd::Statsd
         payload = {
           params: {
             'controller' => 'foo',
@@ -143,21 +157,21 @@ describe InstStatsd::RequestStat do
         }
         @rs = create_subject(payload, @statsd)
         @rs.stats['cache.read'] = 25
-        expect(@statsd).to receive(:timing).with('request.foo.index.cache.read', 25)
+        expect(@statsd).to receive(:timing).with('request.foo.index.cache.read', 25, {short_stat: ".cache.read", tags: {}})
       end
 
       it 'doesnt send sql stats when they dont exist' do
-        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
-        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.read', kind_of(Numeric))
-        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.write', kind_of(Numeric))
-        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.cache', kind_of(Numeric))
+        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000, {short_stat: nil, tags: {}})
+        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.read', kind_of(Numeric), {short_stat: ".sql.read", tags: {}})
+        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.write', kind_of(Numeric), {short_stat: ".sql.write", tags: {}})
+        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.cache', kind_of(Numeric), {short_stat: ".sql.cache", tags: {}})
         @rs.report
       end
 
       it 'sends sql_read_count when present' do
         @rs.stats['sql.read'] = 10
-        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
-        expect(@statsd).to receive(:timing).with('request.foo.index.sql.read', 10)
+        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000, {short_stat: ".total", tags: {}})
+        expect(@statsd).to receive(:timing).with('request.foo.index.sql.read', 10, {short_stat: ".sql.read", tags: {}})
         @rs.report
       end
     end

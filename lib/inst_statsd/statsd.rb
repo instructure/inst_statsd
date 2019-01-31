@@ -15,6 +15,9 @@
 # So if the namespace is "canvas" and the hostname is "app01", the final stat name of "my_stat" would be "stats.canvas.my_stat.app01"
 # (assuming the default statsd/graphite configuration)
 #
+# If dog_tags is set in statsd.yml, it'll use the tags param and will use
+# Data Dog instead of Statsd
+#
 # If statsd isn't configured and enabled, then calls to InstStatsd::Statsd.* will do nothing and return nil
 
 module InstStatsd
@@ -28,13 +31,17 @@ module InstStatsd
       @hostname ||= Socket.gethostname.split('.').first
     end
 
+    def self.dog_tags
+      @dog_tags ||= {}
+    end
+
     %w[increment decrement count gauge timing].each do |method|
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def self.#{method}(stat, *args)
+      def self.#{method}(stat, *args, tags: {}, short_stat: nil)
         if self.instance
           if Array === stat
             stat.each do |st|
-              self.#{method}(st, *args)
+              self.#{method}(st, *args, tags: {}, short_stat: nil)
             end
             return
           end
@@ -44,7 +51,16 @@ module InstStatsd
           else
             stat_name = stat.to_s
           end
-          self.instance.#{method}(stat_name, *args)
+
+          if data_dog?
+            tags.merge!(dog_tags) if tags.is_a? Hash
+            tags = convert_tags(tags)
+            tags << 'host:' unless self.append_hostname?
+            short_stat ||= stat_name
+            self.instance.#{method}(short_stat, *args, tags: tags)
+          else
+            self.instance.#{method}(stat_name, *args)
+          end
         else
           nil
         end
@@ -52,10 +68,22 @@ module InstStatsd
       RUBY
     end
 
-    def self.time(stat, sample_rate = 1)
+    def self.convert_tags(tags)
+      new_tags = []
+      if tags.is_a? Hash
+        tags.each do |tag, v|
+          new_tags << "#{tag}:#{v}"
+        end
+      else
+        return tags
+      end
+      new_tags
+    end
+
+    def self.time(stat, sample_rate = 1, tags: {}, short_stat: nil)
       start = Time.now
       result = yield
-      timing(stat, ((Time.now - start) * 1000).round, sample_rate)
+      timing(stat, ((Time.now - start) * 1000).round, sample_rate, tags: tags, short_stat: short_stat)
       result
     end
 
@@ -75,8 +103,14 @@ module InstStatsd
 
       unless defined?(@statsd)
         statsd_settings = InstStatsd.settings
-
-        if statsd_settings && statsd_settings[:host]
+        if statsd_settings.key?(:dog_tags)
+          @data_dog = true
+          host = statsd_settings[:host] || 'localhost'
+          port = statsd_settings[:port] || 8125
+          @statsd = Datadog::Statsd.new(host, port)
+          @statsd.dog_tags = statsd_settings[:dog_tags] || {}
+          @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
+        elsif statsd_settings && statsd_settings[:host]
           @statsd = ::Statsd.new(statsd_settings[:host])
           @statsd.port = statsd_settings[:port] if statsd_settings[:port]
           @statsd.namespace = statsd_settings[:namespace] if statsd_settings[:namespace]
@@ -92,6 +126,10 @@ module InstStatsd
 
     def self.append_hostname?
       @append_hostname
+    end
+
+    def self.data_dog?
+      @data_dog
     end
 
     def self.reset_instance

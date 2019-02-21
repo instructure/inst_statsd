@@ -53,6 +53,7 @@ module InstStatsd
           end
 
           if data_dog?
+            tags ||= {}
             tags.merge!(dog_tags) if tags.is_a? Hash
             tags = convert_tags(tags)
             tags << 'host:' unless self.append_hostname?
@@ -107,7 +108,7 @@ module InstStatsd
           @data_dog = true
           host = statsd_settings[:host] || 'localhost'
           port = statsd_settings[:port] || 8125
-          @statsd = Datadog::Statsd.new(host, port)
+          @statsd = ::Datadog::Statsd.new(host, port)
           @statsd.dog_tags = statsd_settings[:dog_tags] || {}
           @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
         elsif statsd_settings && statsd_settings[:host]

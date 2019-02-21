@@ -42,12 +42,13 @@ module InstStatsd
     end
 
     def env_settings(env = ENV)
+      dog_tags = JSON.load(env['INST_DOG_TAGS']).to_h if env['INST_DOG_TAGS']
       config = {
         host: env.fetch('INST_STATSD_HOST', nil),
         port: env.fetch('INST_STATSD_PORT', nil),
         namespace: env.fetch('INST_STATSD_NAMESPACE', nil),
         append_hostname: env.fetch('INST_STATSD_APPEND_HOSTNAME', nil),
-        dog_tags: env.fetch('INST_DOG_TAGS', nil)
+        dog_tags: dog_tags
       }
       config.delete_if { |_k, v| v.nil? }
       convert_bool(config, :append_hostname)

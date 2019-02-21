@@ -121,10 +121,10 @@ describe InstStatsd do
 
     it 'builds settings hash with dog environment vars' do
       env = {
-        'INST_DOG_TAGS' => {app: 'canvas', env: 'prod'},
+        'INST_DOG_TAGS' => '{"app": "canvas", "env": "prod"}',
       }
       expected = {
-        dog_tags: {app: 'canvas', env: 'prod'},
+        dog_tags: {"app" => "canvas", "env" => "prod"},
       }
       expect(InstStatsd.env_settings(env)).to eq(expected)
     end

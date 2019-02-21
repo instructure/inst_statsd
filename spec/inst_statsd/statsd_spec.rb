@@ -24,8 +24,11 @@ describe InstStatsd::Statsd do
   it 'sending tags should not break statsd' do
     default_tags = {app: 'canvas', env: 'prod'}
     short_stat = 'test2'
+    env = {
+      'INST_DOG_TAGS' => '{"app": "canvas", "env": "prod"}',
+    }
+    InstStatsd.env_settings(env)
     allow(InstStatsd::Statsd).to receive(:hostname).and_return('testhost')
-    allow(InstStatsd::Statsd).to receive(:dog_tags).and_return(default_tags)
     allow(InstStatsd::Statsd).to receive(:short_stat).and_return(short_stat)
     statsd = double
     allow(InstStatsd::Statsd).to receive(:instance).and_return(statsd)
@@ -53,7 +56,7 @@ describe InstStatsd::Statsd do
       expect(statsd).to receive(method).with(short_stat, 'test', tags: converted_tags)
       InstStatsd::Statsd.send(method, 'test.name', 'test', short_stat: short_stat)
     end
-    expect(statsd).to receive('timing').with(short_stat, anything, anything, tags: converted_tags)
+    expect(statsd).to receive('timing').with(short_stat, anything, sample_rate: anything, tags: converted_tags)
     expect(InstStatsd::Statsd.time('test.name', short_stat: short_stat) {'test'}).to eq 'test'
   end
 
@@ -69,7 +72,7 @@ describe InstStatsd::Statsd do
       expect(statsd).to receive(method).with('test.name', 'test', tags: converted_tags)
       InstStatsd::Statsd.send(method, 'test.name', 'test')
     end
-    expect(statsd).to receive('timing').with('test.name', anything, anything, tags: converted_tags)
+    expect(statsd).to receive('timing').with('test.name', anything, sample_rate: anything, tags: converted_tags)
     expect(InstStatsd::Statsd.time('test.name') {'test'}).to eq 'test'
   end
 

@@ -11,6 +11,7 @@ export INST_STATSD_HOST=statsd.example.org
 export INST_STATSD_PORT=1234
 export INST_STATSD_NAMESPACE=my_app.prod
 export INST_STATSD_APPEND_HOSTNAME=false
+export INST_STATSD_DOG_TAGS='{"app": "canvas", "env": "prod"}'
 ```
 
 Or pass a hash to `InstStatsd.settings`
@@ -32,9 +33,11 @@ Values passed to `InstStatsd.settings` will be merged into and take precedence o
 
 For statsd only the `host` (or `INST_STATSD_HOST` ENV var) is required, all
 other config are optional.
+
 For data dog, only the `dog_tags` (or `INST_DOG_TAGS` ENV vars) are required.
 All others are optional. Having `dog_tags` is how to know to use data_dog.
 A `{}` can be passed if you have no desired default tags.
+The string needs to be parsable as json.
 
 ##### `host`
 

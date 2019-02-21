@@ -58,7 +58,10 @@ module InstStatsd
             tags = convert_tags(tags)
             tags << 'host:' unless self.append_hostname?
             short_stat ||= stat_name
-            self.instance.#{method}(short_stat, *args, tags: tags)
+            opts = { tags: tags }
+            opts[:sample_rate] = args.pop if args.length == 2
+            args << opts
+            self.instance.#{method}(short_stat, *args)
           else
             self.instance.#{method}(stat_name, *args)
           end
@@ -108,8 +111,9 @@ module InstStatsd
           @data_dog = true
           host = statsd_settings[:host] || 'localhost'
           port = statsd_settings[:port] || 8125
+          require 'datadog/statsd'
           @statsd = ::Datadog::Statsd.new(host, port)
-          @statsd.dog_tags = statsd_settings[:dog_tags] || {}
+          self.dog_tags.replace(statsd_settings[:dog_tags] || {})
           @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
         elsif statsd_settings && statsd_settings[:host]
           @statsd = ::Statsd.new(statsd_settings[:host])

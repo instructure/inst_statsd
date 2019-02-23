@@ -11,7 +11,7 @@ export INST_STATSD_HOST=statsd.example.org
 export INST_STATSD_PORT=1234
 export INST_STATSD_NAMESPACE=my_app.prod
 export INST_STATSD_APPEND_HOSTNAME=false
-export INST_STATSD_DOG_TAGS='{"app": "canvas", "env": "prod"}'
+export INST_DOG_TAGS='{"app": "canvas", "env": "prod"}'
 ```
 
 Or pass a hash to `InstStatsd.settings`

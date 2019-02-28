@@ -112,8 +112,7 @@ module InstStatsd
           host = statsd_settings[:host] || 'localhost'
           port = statsd_settings[:port] || 8125
           require 'datadog/statsd'
-          @statsd = ::Datadog::Statsd.new(host, port)
-          @statsd.namespace = statsd_settings[:namespace] if statsd_settings[:namespace]
+          @statsd = ::Datadog::Statsd.new(host, port, namespace: statsd_settings[:namespace])
           self.dog_tags.replace(statsd_settings[:dog_tags] || {})
           @append_hostname = !statsd_settings.key?(:append_hostname) || !!statsd_settings[:append_hostname]
         elsif statsd_settings && statsd_settings[:host]

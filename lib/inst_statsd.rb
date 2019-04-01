@@ -42,7 +42,7 @@ module InstStatsd
     end
 
     def env_settings(env = ENV)
-      dog_tags = JSON.load(env['INST_DOG_TAGS']).to_h if env['INST_DOG_TAGS']
+      dog_tags = JSON.parse(env['INST_DOG_TAGS']).to_h if env['INST_DOG_TAGS']
       config = {
         host: env.fetch('INST_STATSD_HOST', nil),
         port: env.fetch('INST_STATSD_PORT', nil),

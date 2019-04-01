@@ -1,13 +1,17 @@
-FROM ruby:2.3.1
+FROM instructure/ruby:2.4
 
 ENV LC_ALL C.UTF-8
+ENV APP_HOME "/usr/src/app/"
+
+USER root
 
 RUN apt-get update
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p $APP_HOME
 
-ADD . /usr/src/app/
+COPY --chown=docker:docker . $APP_HOME/
+
+USER docker
 
 ENV RAILS_ENV test
 RUN bundle install --system

@@ -15,4 +15,5 @@ USER docker
 
 ENV RAILS_ENV test
 RUN bundle install --system
+RUN bundle exec appraisal install
 

@@ -6,4 +6,4 @@ set -e
 docker build -t inst_statsd .
 
 # run the tests
-docker run --rm inst_statsd bundle exec rspec spec
+docker run --rm inst_statsd bundle exec appraisal rspec spec

@@ -1,4 +1,4 @@
-FROM instructure/ruby:2.4
+FROM instructure/ruby:2.5
 
 ENV LC_ALL C.UTF-8
 ENV APP_HOME "/usr/src/app/"

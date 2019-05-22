@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'inst_statsd'
-  spec.version       = '2.1.4'
+  spec.version       = '2.1.5'
   spec.authors       = ['Nick Cloward', 'Jason Madsen']
   spec.email         = ['ncloward@instructure.com', 'jmadsen@instructure.com']
   spec.summary       = 'Statsd for Instructure'
@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.3'
 
-  spec.add_dependency 'dogstatsd-ruby', '~> 3.3'
+  spec.add_dependency 'dogstatsd-ruby', '~> 4.2'
   spec.add_dependency 'statsd-ruby', '~> 1.0'
   spec.add_dependency 'aroi', '~> 0.0.6'
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Proxy class to communicate messages to statsd
 # Available statsd messages are described in:
 #   https://github.com/etsy/statsd/blob/master/README.md

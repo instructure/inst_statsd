@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module InstStatsd
   class RequestStat < BlockStat
     def initialize(name, start, finish, id, payload, statsd=InstStatsd::Statsd)

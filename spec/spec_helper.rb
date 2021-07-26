@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'inst_statsd'
 
 RSpec.configure do |config|

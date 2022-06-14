@@ -20,6 +20,7 @@ module InstStatsd
         self.short_stat = "request"
         self.tags[:controller] = controller if controller
         self.tags[:action] = action if action
+        self.tags[:status] = status if status
       else
         self.common_key = "request.#{controller}.#{action}" if controller && action
       end
@@ -46,6 +47,17 @@ module InstStatsd
 
     def action
       @payload.fetch(:params, {})['action']
+    end
+
+    def status
+      status = @payload.fetch(:status, 0)
+      # Only return status group to reduce the number of indexed custom metrics (and cost) of datadog
+      return '1XX' if status >= 100 and status < 200
+      return '2XX' if status >= 200 and status < 300
+      return '3XX' if status >= 300 and status < 400
+      return '4XX' if status >= 400 and status < 500
+      return '5XX' if status >= 500 and status < 600
+      nil
     end
 
     def total

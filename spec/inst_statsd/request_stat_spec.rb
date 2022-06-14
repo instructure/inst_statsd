@@ -70,6 +70,22 @@ describe InstStatsd::RequestStat do
     end
   end
 
+  describe '#status' do
+    it 'should return nil if status is not defined' do
+      rs = create_subject
+      expect(rs.status).to eq nil
+    end
+
+    it 'should return HTTP status group if present' do
+      expect(create_subject({status: 200}).status).to eq '2XX'
+      expect(create_subject({status: 201}).status).to eq '2XX'
+      expect(create_subject({status: 302}).status).to eq '3XX'
+      expect(create_subject({status: 400}).status).to eq '4XX'
+      expect(create_subject({status: 404}).status).to eq '4XX'
+      expect(create_subject({status: 503}).status).to eq '5XX'
+    end
+  end
+
   describe '#total' do
     it 'correctly calculates milliseconds from start, finish' do
       rs = create_subject({params: {}})
@@ -113,10 +129,11 @@ describe InstStatsd::RequestStat do
         params: {
           'controller' => 'foo',
           'action'     => 'index'
-        }
+        },
+        status: 200
       }
       rs = create_subject(payload, statsd)
-      expect(statsd).to receive(:timing).with('request.total', 1000, {short_stat: 'request.total', tags: {action: "index", controller: "foo"}} )
+      expect(statsd).to receive(:timing).with('request.total', 1000, {short_stat: 'request.total', tags: {action: "index", controller: "foo", status: '2XX'}} )
       rs.report
     end
 

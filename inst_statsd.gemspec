@@ -6,7 +6,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'inst_statsd'
-  spec.version       = '2.3.0'
+  spec.version       = '2.4.0'
   spec.authors       = ['Nick Cloward', 'Jason Madsen']
   spec.email         = ['ncloward@instructure.com', 'jmadsen@instructure.com']
   spec.summary       = 'Statsd for Instructure'

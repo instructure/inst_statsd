@@ -24,6 +24,8 @@
 
 module InstStatsd
   module Statsd
+    extend InstStatsd::Event
+
     # replace "." in key names with another character to avoid creating spurious sub-folders in graphite
     def self.escape(str, replacement = '_')
       str.respond_to?(:gsub) ? str.gsub('.', replacement) : str

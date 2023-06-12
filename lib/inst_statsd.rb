@@ -8,6 +8,7 @@ module InstStatsd
 
   class ConfigurationError < StandardError; end
 
+  require 'inst_statsd/event'
   require 'inst_statsd/statsd'
   require 'inst_statsd/block_stat'
   require 'inst_statsd/block_tracking'

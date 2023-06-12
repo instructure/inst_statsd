@@ -10,6 +10,10 @@ describe InstStatsd::Statsd do
     InstStatsd::Statsd.reset_instance
   end
 
+  it 'includes the events module' do
+    expect(described_class).to respond_to :event
+  end
+
   it 'appends the hostname to stat names by default' do
     allow(InstStatsd::Statsd).to receive(:hostname).and_return('testhost')
     statsd = double

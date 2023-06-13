@@ -1,4 +1,4 @@
-FROM instructure/ruby:2.5
+FROM instructure/ruby:2.7
 
 ENV LC_ALL C.UTF-8
 

@@ -4,9 +4,11 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require_relative 'lib/inst_statsd/version'
+
 Gem::Specification.new do |spec|
   spec.name          = 'inst_statsd'
-  spec.version       = '2.4.0'
+  spec.version       = InstStatsd::VERSION
   spec.authors       = ['Nick Cloward', 'Jason Madsen']
   spec.email         = ['ncloward@instructure.com', 'jmadsen@instructure.com']
   spec.summary       = 'Statsd for Instructure'
@@ -18,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 2.3'
+  spec.required_ruby_version = '>= 2.7'
 
   spec.add_dependency 'dogstatsd-ruby', '~> 4.2'
   spec.add_dependency 'statsd-ruby', '~> 1.0'

@@ -10,9 +10,24 @@ pipeline {
         sh 'docker build -t inst_statsd .'
       }
     }
+
     stage('Test') {
       steps {
         sh 'docker run --rm inst_statsd bundle exec appraisal rspec spec'
+      }
+    }
+
+    stage('Publish') {
+      when {
+        allOf {
+          expression { GERRIT_BRANCH == "master" }
+          environment name: "GERRIT_EVENT_TYPE", value: "change-merged"
+        }
+      }
+      steps {
+        withCredentials([string(credentialsId: 'rubygems-rw', variable: 'GEM_HOST_API_KEY')]) {
+          sh 'docker run -e GEM_HOST_API_KEY --rm inst_statsd /bin/bash -lc "./bin/publish.sh"'
+        }
       }
     }
   }

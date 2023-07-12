@@ -95,6 +95,24 @@ describe InstStatsd::Statsd do
     expect(InstStatsd::Statsd.time('test.name') { 'test' }).to eq 'test'
   end
 
+  context 'with datadog enabled' do
+    it 'handles being called with an array of stat names' do
+      converted_tags = %w[tag:value host:]
+      statsd = double
+      allow(InstStatsd::Statsd).to receive(:instance).and_return(statsd)
+      allow(InstStatsd::Statsd).to receive(:append_hostname?).and_return(false)
+      allow(InstStatsd::Statsd).to receive(:data_dog?).and_return(true)
+      METHODS.each do |method|
+        expect(statsd).to receive(method).once.with('test.one', 'value', tags: converted_tags)
+        expect(statsd).to receive(method).once.with('test.two', 'value', tags: converted_tags)
+        InstStatsd::Statsd.send(method, %w[test.one test.two], 'value', tags: {tag: 'value'}, short_stat: 'short_stat')
+      end
+      expect(statsd).to receive('timing').once.with('test.one', anything, tags: converted_tags, sample_rate: anything)
+      expect(statsd).to receive('timing').once.with('test.two', anything, tags: converted_tags, sample_rate: anything)
+      expect(InstStatsd::Statsd.time(%w[test.one test.two], tags: {tag: 'value'}, short_stat: 'short_stat') { 'test' }).to eq 'test'
+    end
+  end
+
   it "ignores all calls if statsd isn't enabled" do
     allow(InstStatsd::Statsd).to receive(:instance).and_return(nil)
     METHODS.each do |method|

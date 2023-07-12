@@ -45,7 +45,7 @@ module InstStatsd
         if self.instance
           if Array === stat
             stat.each do |st|
-              self.#{method}(st, *args, tags: {}, short_stat: nil)
+              self.#{method}(st, *args, tags: tags, short_stat: nil)
             end
             return
           end

@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7'
 
-  spec.add_dependency 'dogstatsd-ruby', '~> 4.2'
+  spec.add_dependency 'dogstatsd-ruby', '>= 4.2', '< 6.0', '!= 5.0.0' # need the #batch method that's not in 5.0.0
   spec.add_dependency 'statsd-ruby', '~> 1.0'
   spec.add_dependency 'aroi', '>= 0.0.7'
 

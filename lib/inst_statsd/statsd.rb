@@ -119,8 +119,13 @@ module InstStatsd
           @data_dog = true
           host = statsd_settings[:host] || "localhost"
           port = statsd_settings[:port] || 8125
+          socket_path = statsd_settings[:socket_path]
           require "datadog/statsd"
-          @statsd = Datadog::Statsd.new(host, port, namespace: statsd_settings[:namespace])
+          @statsd = if socket_path
+                      Datadog::Statsd.new(socket_path: socket_path, namespace: statsd_settings[:namespace])
+                    else
+                      Datadog::Statsd.new(host, port, namespace: statsd_settings[:namespace])
+                    end
           dog_tags.replace(statsd_settings[:dog_tags] || {})
           @append_hostname = statsd_settings[:append_hostname]
         elsif statsd_settings && statsd_settings[:host]

@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
-require 'logger'
+require "logger"
 
 module InstStatsd
   class NullLogger < Logger
-    def initialize(*args)
+    def initialize(*) # rubocop:disable Lint/MissingSuper
     end
 
-    def add(*args, &block)
-    end
+    def add(*); end
   end
 end

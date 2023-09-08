@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'inst_statsd'
+require "inst_statsd"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
@@ -8,5 +8,5 @@ RSpec.configure do |config|
 
   config.raise_errors_for_deprecations!
 
-  config.order = 'random'
+  config.order = "random"
 end

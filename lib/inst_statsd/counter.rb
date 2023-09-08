@@ -12,10 +12,9 @@ module InstStatsd
       end
     end
 
-    attr_reader :key
-    attr_reader :blocked_names
+    attr_reader :key, :blocked_names
 
-    def initialize(key, blocked_names=[], tags: {}, short_stat: nil)
+    def initialize(key, blocked_names = [], tags: {}, short_stat: nil)
       @blocked_names = blocked_names
       @key = key
       @tls_key = "statsd.#{key}"
@@ -41,6 +40,5 @@ module InstStatsd
     def accepted_name?(name)
       !blocked_names.include?(name)
     end
-
   end
 end

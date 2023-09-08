@@ -1,0 +1,28 @@
+require:
+  - rubocop-rake
+
+inherit_gem:
+  rubocop-inst:
+  - rubocop.yml
+  - rubocop-rspec.yml
+
+AllCops:
+  TargetRubyVersion: 2.7
+
+Performance/MethodObjectAsBlock:
+  Enabled: false
+
+RSpec/InstanceVariable:
+  Enabled: false
+RSpec/NamedSubject:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Exclude:
+   - "gemfiles/*.gemfile"
+Style/SpecialGlobalVars:
+  Enabled: false
+Style/FetchEnvVar:
+  Enabled: false

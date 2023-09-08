@@ -11,9 +11,15 @@ pipeline {
       }
     }
 
+    stage('Lint') {
+      steps {
+        sh "docker run --rm inst_statsd bin/rubocop"
+      }
+    }
+
     stage('Test') {
       steps {
-        sh 'docker run --rm inst_statsd bundle exec appraisal rspec spec'
+        sh 'docker run --rm inst_statsd bundle exec appraisal rspec'
       }
     }
 

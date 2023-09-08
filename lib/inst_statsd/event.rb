@@ -44,7 +44,7 @@ module InstStatsd
       instance.event(
         title,
         text,
-        {
+        **{
           alert_type: alert_type,
           priority: priority,
           date_happened: date_happened,

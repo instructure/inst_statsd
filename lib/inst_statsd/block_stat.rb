@@ -2,13 +2,9 @@
 
 module InstStatsd
   class BlockStat
+    attr_accessor :stats, :common_key, :short_stat, :tags
 
-    attr_accessor :stats
-    attr_accessor :common_key
-    attr_accessor :short_stat
-    attr_accessor :tags
-
-    def initialize(common_key, statsd=InstStatsd::Statsd, tags: {}, short_stat: nil)
+    def initialize(common_key, statsd = InstStatsd::Statsd, tags: {}, short_stat: nil)
       self.common_key = common_key
       @tags = tags
       @short_stat = short_stat
@@ -27,17 +23,21 @@ module InstStatsd
 
     def exclusive_stats
       return nil unless @exclusives
-      stats.map { |key, value| [key, value - (@exclusives[key] || 0.0)] }.to_h
+
+      stats.to_h { |key, value| [key, value - (@exclusives[key] || 0.0)] }
     end
 
     def report
-      if common_key
-        stats.each do |(key, value)|
-          @statsd.timing("#{common_key}.#{key}", value, tags: @tags, short_stat: "#{@short_stat}.#{key}")
-        end
-        exclusive_stats&.each do |(key, value)|
-          @statsd.timing("#{common_key}.exclusive.#{key}", value, tags: @tags, short_stat: "#{@short_stat}.exclusive.#{key}")
-        end
+      return unless common_key
+
+      stats.each do |(key, value)|
+        @statsd.timing("#{common_key}.#{key}", value, tags: @tags, short_stat: "#{@short_stat}.#{key}")
+      end
+      exclusive_stats&.each do |(key, value)|
+        @statsd.timing("#{common_key}.exclusive.#{key}",
+                       value,
+                       tags: @tags,
+                       short_stat: "#{@short_stat}.exclusive.#{key}")
       end
     end
   end

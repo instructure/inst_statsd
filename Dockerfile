@@ -6,6 +6,6 @@ COPY --chown=docker:docker . /usr/src/app/
 
 USER docker
 
+ENV BUNDLER_VERSION 2.4.19
 ENV RAILS_ENV test
-RUN bundle install -j 4
-RUN bundle exec appraisal install
+RUN gem install bundler -v 2.4.19 && bundle install -j 4

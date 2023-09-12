@@ -2,4 +2,21 @@
 
 source "https://rubygems.org"
 
+plugin "bundler-multilock", "1.0.6"
+return unless Plugin.installed?("bundler-multilock")
+
+Plugin.send(:load_plugin, "bundler-multilock")
+
 gemspec
+
+lockfile "rails-6.0" do
+  gem "activerecord", "~> 6.0.0"
+end
+
+lockfile "rails-6.1" do
+  gem "activerecord", "~> 6.1.0"
+end
+
+lockfile "rails-7.0" do
+  gem "activerecord", "~> 7.0.4"
+end

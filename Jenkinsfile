@@ -19,7 +19,9 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh 'docker run --rm inst_statsd bundle exec appraisal rspec'
+        sh 'docker run --rm -e BUNDLE_LOCKFILE=rails-6.0 inst_statsd bin/rspec'
+        sh 'docker run --rm -e BUNDLE_LOCKFILE=rails-6.1 inst_statsd bin/rspec'
+        sh 'docker run --rm -e BUNDLE_LOCKFILE=rails-7.0 inst_statsd bin/rspec'
       }
     }
 

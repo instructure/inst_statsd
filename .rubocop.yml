@@ -9,6 +9,9 @@ inherit_gem:
 AllCops:
   TargetRubyVersion: 2.7
 
+Bundler/DuplicatedGem:
+  Enabled: false
+
 Performance/MethodObjectAsBlock:
   Enabled: false
 

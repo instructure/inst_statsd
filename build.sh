@@ -6,4 +6,8 @@ set -e
 docker build -t inst_statsd .
 
 # run the tests
-docker run --rm inst_statsd bundle exec appraisal rspec spec
+
+for f in Gemfile.*.lock
+do
+  docker run -e BUNDLE_LOCKFILE=$f --rm inst_statsd bin/rspec
+done

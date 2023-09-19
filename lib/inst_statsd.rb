@@ -11,7 +11,8 @@ module InstStatsd
                       negative_mask
                       batch_size
                       batch_byte_size
-                      dog_tags].freeze
+                      dog_tags
+                      socket_path].freeze
 
   class ConfigurationError < StandardError; end
 

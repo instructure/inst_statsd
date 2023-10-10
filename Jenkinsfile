@@ -22,6 +22,7 @@ pipeline {
         sh 'docker run --rm -e BUNDLE_LOCKFILE=rails-6.0 inst_statsd bin/rspec'
         sh 'docker run --rm -e BUNDLE_LOCKFILE=rails-6.1 inst_statsd bin/rspec'
         sh 'docker run --rm -e BUNDLE_LOCKFILE=rails-7.0 inst_statsd bin/rspec'
+        sh 'docker run --rm -e BUNDLE_LOCKFILE=Gemfile.lock inst_statsd bin/rspec'
       }
     }
 

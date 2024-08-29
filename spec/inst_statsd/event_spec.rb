@@ -105,6 +105,20 @@ RSpec.describe InstStatsd::Event do
       end
     end
 
+    context "with a valid type set as a string" do
+      let(:opts) { { type: "deploy" } }
+
+      it "sets the valid aggregation key" do
+        expect(instance).to receive(:event).with(
+          title,
+          text,
+          tags: { type: :deploy }
+        )
+
+        subject
+      end
+    end
+
     context "with custom tags" do
       let(:opts) { { tags: { project: "cool-project" } } }
 

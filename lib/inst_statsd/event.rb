@@ -57,7 +57,7 @@ module InstStatsd
 
     def tags_from_opts(tags, type, dd_tags)
       custom_tags = tags.merge(dd_tags)
-      custom_tags[:type] = type if SUPPORTED_TYPES.include? type
+      custom_tags[:type] = type.to_sym if SUPPORTED_TYPES.include? type&.to_sym
       custom_tags.compact
     end
   end

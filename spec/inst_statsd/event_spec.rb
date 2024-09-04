@@ -14,6 +14,49 @@ RSpec.describe InstStatsd::Event do
   let(:dog_tags) { {} }
   let(:opts) { {} }
 
+  describe "#feature_event" do
+    subject { feature_event(title, text, **opts) }
+
+    context "with title and text only" do
+      let(:opts) { {} }
+
+      it 'invokes "event" on the instance with title and text' do
+        expect(instance).to receive(:event).with(
+          title,
+          text,
+          alert_type: :success,
+          priority: :normal,
+          tags: { type: InstStatsd::Event::FEATURE_EVENT }
+        )
+
+        subject
+      end
+    end
+
+    context "with all opts set" do
+      let(:date_happened) { Time.now.to_i }
+      let(:opts) do
+        {
+          date_happened: date_happened,
+          tags: { foo: "bar" }
+        }
+      end
+
+      it "sets all arguments" do
+        expect(instance).to receive(:event).with(
+          title,
+          text,
+          alert_type: :success,
+          priority: :normal,
+          date_happened: date_happened,
+          tags: { foo: "bar", type: InstStatsd::Event::FEATURE_EVENT }
+        )
+
+        subject
+      end
+    end
+  end
+
   describe "#event" do
     subject { event(title, text, **opts) }
 
@@ -77,28 +120,14 @@ RSpec.describe InstStatsd::Event do
       end
     end
 
-    context "with an invalid type set" do
-      let(:opts) { { type: :banana } }
-
-      it "does not sent the invalid aggregation key" do
-        expect(instance).to receive(:event).with(
-          title,
-          text,
-          tags: {}
-        )
-
-        subject
-      end
-    end
-
     context "with a valid type set" do
-      let(:opts) { { type: :deploy } }
+      let(:opts) { { type: InstStatsd::Event::DEPLOY_EVENT } }
 
       it "sets the valid aggregation key" do
         expect(instance).to receive(:event).with(
           title,
           text,
-          tags: { type: :deploy }
+          tags: { type: InstStatsd::Event::DEPLOY_EVENT }
         )
 
         subject
@@ -112,7 +141,7 @@ RSpec.describe InstStatsd::Event do
         expect(instance).to receive(:event).with(
           title,
           text,
-          tags: { type: :deploy }
+          tags: { type: InstStatsd::Event::DEPLOY_EVENT }
         )
 
         subject
@@ -137,7 +166,7 @@ RSpec.describe InstStatsd::Event do
       let(:date_happened) { Time.now.to_i }
       let(:opts) do
         {
-          type: :deploy,
+          type: InstStatsd::Event::DEPLOY_EVENT,
           alert_type: :warning,
           priority: :low,
           date_happened: date_happened,
@@ -152,7 +181,7 @@ RSpec.describe InstStatsd::Event do
           alert_type: :warning,
           priority: :low,
           date_happened: date_happened,
-          tags: { foo: "bar", type: :deploy }
+          tags: { foo: "bar", type: InstStatsd::Event::DEPLOY_EVENT }
         )
 
         subject

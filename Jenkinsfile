@@ -29,7 +29,7 @@ pipeline {
     stage('Publish') {
       when {
         allOf {
-          expression { GERRIT_BRANCH == "master" }
+          expression { GERRIT_BRANCH == "main" }
           environment name: "GERRIT_EVENT_TYPE", value: "change-merged"
         }
       }

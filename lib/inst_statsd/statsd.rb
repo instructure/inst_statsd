@@ -150,6 +150,10 @@ module InstStatsd
       @data_dog
     end
 
+    def self.initialized?
+      defined?(@statsd)
+    end
+
     def self.reset_instance
       remove_instance_variable(:@statsd) if defined?(@statsd)
       Thread.current[:inst_statsd] = nil

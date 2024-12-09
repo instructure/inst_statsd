@@ -29,6 +29,7 @@
 module InstStatsd
   module Statsd
     extend InstStatsd::Event
+    extend InstStatsd::Distribution
 
     # replace "." in key names with another character to avoid creating spurious sub-folders in graphite
     def self.escape(str, replacement = "_")

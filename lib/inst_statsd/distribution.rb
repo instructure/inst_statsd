@@ -29,6 +29,9 @@ module InstStatsd
     # @example Increment the error count:
     #  InstStatsd::Statsd.distributed_increment('client.request.failed', tags: { status: '500' })
     def distributed_increment(metric, tags: {})
+      # Non-Datadog clients don't support distribution metrics, so we use fall back to increment
+      return increment(metric, tags: tags) if instance && !data_dog?
+
       distribution(metric, 1, tags: tags)
     end
   end

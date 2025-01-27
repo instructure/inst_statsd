@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    inst_statsd (3.0.4)
+    inst_statsd (3.3.1)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)

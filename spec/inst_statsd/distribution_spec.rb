@@ -67,7 +67,7 @@ RSpec.describe InstStatsd::Distribution do
       let(:is_datadog) { false }
 
       it 'invokes "increment" on InstStatsd::Statsd with metric and tags' do
-        expect(InstStatsd::Statsd).to receive(:increment).with(metric, tags: tags)
+        expect(InstStatsd::Statsd).to receive(:increment).with(metric, tags: tags, short_stat: nil)
 
         subject
       end

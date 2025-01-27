@@ -18,6 +18,12 @@ module InstStatsd
     def distribution(metric, value, tags: {})
       return unless instance && data_dog?
 
+      metric = if append_hostname?
+                 "#{metric}.#{hostname}"
+               else
+                 metric.to_s
+               end
+
       instance.distribution(metric, value, { tags: tags.merge(dog_tags) }.compact)
     end
 
@@ -25,14 +31,15 @@ module InstStatsd
     #
     # @param metric [String] The name of the metric to increment.
     # @param tags [Hash] Optional tags to associate with the metric.
+    # @param short_stat [String, nil] Stat name to use instead of `metric` if backed by DataDog.
     #
     # @example Increment the error count:
     #  InstStatsd::Statsd.distributed_increment('client.request.failed', tags: { status: '500' })
-    def distributed_increment(metric, tags: {})
+    def distributed_increment(metric, tags: {}, short_stat: nil)
       # Non-Datadog clients don't support distribution metrics, so we use fall back to increment
-      return increment(metric, tags: tags) if instance && !data_dog?
+      return increment(metric, tags: tags, short_stat: short_stat) if instance && !data_dog?
 
-      distribution(metric, 1, tags: tags)
+      distribution(short_stat || metric, 1, tags: tags)
     end
   end
 end

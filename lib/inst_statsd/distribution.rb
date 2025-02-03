@@ -23,8 +23,9 @@ module InstStatsd
                else
                  metric.to_s
                end
+      tags = tags.merge(dog_tags) if tags.is_a?(Hash)
 
-      instance.distribution(metric, value, { tags: tags.merge(dog_tags) }.compact)
+      instance.distribution(metric, value, { tags: tags })
     end
 
     # Increments the specified distribution metric by 1.

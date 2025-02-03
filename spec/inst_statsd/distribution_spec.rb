@@ -30,6 +30,15 @@ RSpec.describe InstStatsd::Distribution do
 
         subject
       end
+
+      it "handles an array of tags" do
+        expect(instance).to receive(:distribution).with(
+          metric,
+          value,
+          { tags: ["status:500"] }
+        )
+        InstStatsd::Statsd.distribution(metric, value, tags: ["status:500"])
+      end
     end
 
     context "when instance and data_dog? are not configured" do

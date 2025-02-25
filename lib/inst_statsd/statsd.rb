@@ -55,17 +55,10 @@ module InstStatsd
               return                                                    #       return
             end                                                         #     end
                                                                         #
-            if self.append_hostname?                                    #     if self.append_hostname?
-              stat_name = "\#{stat}.\#{hostname}"                       #       stat_name = "\#{stat}.\#{hostname}"
-            else                                                        #     else
-              stat_name = stat.to_s                                     #       stat_name = stat.to_s
-            end                                                         #     end
+            stat_name = stat_name_for(stat)                             #     stat_name = stat_name_for(stat)
                                                                         #
             if data_dog?                                                #     if data_dog?
-              tags = tags ? tags.dup : {}                               #       tags ||= {}
-              tags.merge!(dog_tags) if tags.is_a? Hash                  #       tags.merge!(dog_tags) if tags.is_a? Hash
-              tags = convert_tags(tags)                                 #       tags = convert_tags(tags)
-              tags << 'host:' unless self.append_hostname?              #       tags << 'host:' unless self.append_hostname?
+              tags = prepare_datadog_tags(tags)                         #       tags = prepare_datadog_tags(tags)
               short_stat ||= stat_name                                  #       short_stat ||= stat_name
               opts = { tags: tags }                                     #       opts = { tags: tags }
               opts[:sample_rate] = args.pop if args.length == 2         #       opts[:sample_rate] = args.pop if args.length == 2
@@ -79,6 +72,21 @@ module InstStatsd
           end                                                           #   end
         end                                                             # end
       RUBY
+    end
+
+    def self.stat_name_for(metric)
+      return "#{metric}.#{hostname}" if append_hostname?
+
+      metric.to_s
+    end
+
+    def self.prepare_datadog_tags(tags)
+      tags = tags ? tags.dup : {}
+      tags.merge!(dog_tags) if tags.is_a? Hash
+      tags = convert_tags(tags)
+      tags << "host:" unless append_hostname?
+
+      tags
     end
 
     def self.convert_tags(tags)

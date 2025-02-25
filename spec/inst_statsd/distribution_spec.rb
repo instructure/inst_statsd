@@ -5,9 +5,15 @@ require "datadog/statsd"
 
 RSpec.describe InstStatsd::Distribution do
   let(:instance) { instance_double(Datadog::Statsd) }
+  let(:append_hostname) { false }
 
   before do
-    allow(InstStatsd::Statsd).to receive_messages(data_dog?: is_datadog, dog_tags: dog_tags, instance: instance)
+    allow(InstStatsd::Statsd).to receive_messages(
+      data_dog?: is_datadog,
+      dog_tags: dog_tags,
+      instance: instance,
+      append_hostname?: append_hostname
+    )
   end
 
   describe ".distribution" do
@@ -25,7 +31,7 @@ RSpec.describe InstStatsd::Distribution do
         expect(instance).to receive(:distribution).with(
           metric,
           value,
-          { tags: { status: "500", environment: "production" } }
+          { tags: ["status:500", "environment:production", "host:"] }
         )
 
         subject
@@ -35,9 +41,37 @@ RSpec.describe InstStatsd::Distribution do
         expect(instance).to receive(:distribution).with(
           metric,
           value,
-          { tags: ["status:500"] }
+          { tags: ["status:500", "host:"] }
         )
         InstStatsd::Statsd.distribution(metric, value, tags: ["status:500"])
+      end
+
+      context "when the tags are nil" do
+        let(:tags) { nil }
+
+        it "handles nil tags" do
+          expect(instance).to receive(:distribution).with(
+            metric,
+            value,
+            { tags: ["environment:production", "host:"] }
+          )
+
+          subject
+        end
+      end
+
+      context "when append_hostname? is true" do
+        let(:append_hostname) { true }
+
+        it "appends the hostname to the metric and excludes a host tag" do
+          expect(instance).to receive(:distribution).with(
+            "#{metric}.#{Socket.gethostname}",
+            value,
+            { tags: ["status:500", "environment:production"] }
+          )
+
+          subject
+        end
       end
     end
 
@@ -66,9 +100,23 @@ RSpec.describe InstStatsd::Distribution do
     end
 
     it 'invokes "distribution" on InstStatsd::Statsd with metric, 1, and tags' do
-      expect(InstStatsd::Statsd).to receive(:distribution).with(metric, 1, tags: tags)
+      expect(InstStatsd::Statsd).to receive(:distribution).with(metric, 1, tags: ["status:401", "host:"])
 
       subject
+    end
+
+    context "when append_hostname? is true" do
+      let(:append_hostname) { true }
+
+      it "appends the hostname to the metric and excludes a host tag" do
+        expect(InstStatsd::Statsd).to receive(:distribution).with(
+          "#{metric}.#{Socket.gethostname}",
+          1,
+          { tags: ["status:401"] }
+        )
+
+        subject
+      end
     end
 
     context "when the configured instance is not a DataDog instance" do
